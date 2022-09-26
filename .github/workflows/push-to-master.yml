@@ -3,7 +3,7 @@ name: Push to master
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 concurrency:
   group: master
