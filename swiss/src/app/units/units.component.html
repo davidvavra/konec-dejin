@@ -1,5 +1,13 @@
 <div class="tab-content">
     <mat-card class="card">
+        <button mat-stroked-button color="accent" (click)="export()">Export</button>
+        &nbsp;
+        <mat-form-field>
+            <ngx-mat-file-input placeholder="Vyber CSV soubor" [accept]="'.csv'" #file></ngx-mat-file-input>
+            <mat-icon matSuffix>folder</mat-icon>
+        </mat-form-field>
+        &nbsp;
+        <button mat-stroked-button color="accent" (click)="import(file)">Import</button>
         <form #selectDelegateForm="ngForm">
             <mat-form-field>
                 <mat-label>Hráč</mat-label>
@@ -70,17 +78,4 @@
             <button type="Submit" mat-raised-button color="accent">Přidat jednotku</button>
         </form>
     </mat-card>
-    <ng-container *ngIf="delegateId">
-        <p>Přidat jednotky:</p>
-        <mat-card class="card">
-            <mat-form-field>
-                <ngx-mat-file-input placeholder="Vyber CSV soubor" [accept]="'.csv'" #file></ngx-mat-file-input>
-                <mat-icon matSuffix>folder</mat-icon>
-            </mat-form-field>
-            &nbsp;
-            <button mat-stroked-button color="accent" (click)="importUnits(file)">Přidat jednotky</button>
-            <br />
-            CSV musí mít stejné názvy sloupečků jako seznam nahoře. <a href="https://github.com/davidvavra/duna-valka-assassinu/blob/master/database-constants.md">Hodnoty enumů</a>.
-        </mat-card>
-    </ng-container>
 </div>
