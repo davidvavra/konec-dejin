@@ -72,6 +72,13 @@
     <button mat-button color="accent" *ngIf="!editingBv" (click)="editBv()">Upravit</button>
     <br /><br />
     <button mat-stroked-button color="accent" (click)="exportBv()">Export BV pro všechna kola</button>
+    &nbsp;
+    <mat-form-field>
+        <ngx-mat-file-input placeholder="Vyber CSV soubor" [accept]="'.csv'" #file_bv></ngx-mat-file-input>
+        <mat-icon matSuffix>folder</mat-icon>
+    </mat-form-field>
+    &nbsp;
+    <button mat-stroked-button color="accent" (click)="importBv(file_bv)">Import BV pro všechna kola</button>
 </mat-card>
 <p>Akce:</p>
 <mat-card class="card">
@@ -83,11 +90,11 @@
     <button mat-stroked-button color="accent" (click)="deleteActions()">Promazat akce</button>
     <br /><br />
     <mat-form-field>
-        <ngx-mat-file-input placeholder="Vyber CSV soubor" [accept]="'.csv'" #file></ngx-mat-file-input>
+        <ngx-mat-file-input placeholder="Vyber CSV soubor" [accept]="'.csv'" #file_actions></ngx-mat-file-input>
         <mat-icon matSuffix>folder</mat-icon>
     </mat-form-field>
     &nbsp;
-    <button mat-stroked-button color="accent" (click)="importActions(file)">Import výsledků</button>
+    <button mat-stroked-button color="accent" (click)="importActions(file_actions)">Import výsledků</button>
 </mat-card>
 <p>Mise:</p>
 <mat-card class="card">

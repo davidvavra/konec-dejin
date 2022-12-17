@@ -307,7 +307,7 @@ export class RoundComponent implements OnInit {
                       combined.units.filter(snap => {
                         let unit = snap.payload.val()
                         return unit["delegate"] == delegateId && (unit["type"] == "active_hero" || unit["type"] == "army") && unit["state"] == "alive"
-                      }).forEach(unitSnap => { 
+                      }).forEach(unitSnap => {
                         this.db.list("actions/" + this.roundId).push(
                           {
                             delegate: delegateId,
@@ -393,15 +393,33 @@ export class RoundComponent implements OnInit {
                         rowData.push(0)
                       }
                     }
+                    // for import
+                    rowData.push(delegateId)
+                    for (let index = 0; index < roundCount; index++) {
+                      if (index + 2 == roundColumn) {
+                        rowData.push(key)
+                      } else {
+                        rowData.push("")
+                      }
+                    }
+
                     data.push(rowData)
                   } else {
                     row[roundColumn] = bv["bv"]
+                    // for import
+                    row[roundColumn + roundCount + 1] = key
                   }
                 })
               });
             }
 
           });
+          // For import
+          headers.push("ID hráče")
+          combined.rounds.forEach(round => {
+            headers.push(round.key)
+          })
+
           let options = {
             headers: headers
           };
@@ -409,6 +427,46 @@ export class RoundComponent implements OnInit {
         }
       )
     ).subscribe()
+  }
+
+  importBv(file) {
+    let fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      let papa = new Papa()
+      papa.parse(fileReader.result as string, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (result) => {
+          let headers = result.meta.fields
+          let descriptionIndex = headers.indexOf("Popis")
+          let delegateIdIndex = headers.indexOf("ID hráče")
+          let roundCount = delegateIdIndex - descriptionIndex - 1
+          result.data.forEach(el => {
+            let delegateId = el["ID hráče"]
+            let description = el["Popis"]
+            for (let bvColumn = descriptionIndex + 1; bvColumn < delegateIdIndex; bvColumn++) {
+              let bv = parseInt(el[headers[bvColumn]])
+              let roundId = headers[bvColumn + roundCount + 1]
+              let changeId = el[roundId]
+              if (bv != 0 && changeId != "") {
+                this.db.object("bvRounds/" + roundId + "/" + delegateId + "/" + changeId).update({
+                  bv: bv
+                })
+              } else if (bv == 0 && changeId != "") {
+                this.db.object("bvRounds/" + roundId + "/" + delegateId + "/" + changeId).remove()
+              } else if (bv != 0 && changeId == "") {
+                this.db.list("bvRounds/" + roundId + "/" + delegateId).push({
+                  description: description,
+                  bv: bv,
+                  originalRoundCount: 0
+                })
+              }
+            }
+          });
+        }
+      });
+    }
+    fileReader.readAsText(file.value.files[0]);
   }
 
   private calculateProjects(): Observable<Project[]> {
