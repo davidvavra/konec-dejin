@@ -4,3 +4,12 @@
 .number {
     width: 8em;
 }
+
+.defined-width {
+    width: 630px;
+}
+
+.basic-checkbox {
+    padding: 1.25em;
+    padding-left: 2.5em;
+}

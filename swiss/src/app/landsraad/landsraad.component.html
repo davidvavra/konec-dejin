@@ -1,7 +1,7 @@
 <div class="tab-content">
     <mat-card class="card">
         <form #currentQuestionForm="ngForm">
-            <mat-form-field>
+            <mat-form-field class="defined-width">
                 <mat-label>Aktuální otázka</mat-label>
                 <mat-select name="currentQuestion" [value]="currentQuestion | async"
                     (selectionChange)="currentQuestionChanged($event)">
@@ -10,6 +10,9 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
+            <mat-checkbox class="basic-checkbox" checked="(resultsShown | async)" (change)="toggleVotingCheckbox($event)">
+                Ukázat výsledky
+            </mat-checkbox>
         </form>
         <ng-container *ngIf="(currentQuestion | async) as questionId">
             <span>Hlasovalo: {{ alreadyVotedCount | async }} / {{ maxVotedCount | async }} hlasovacích práv</span>
