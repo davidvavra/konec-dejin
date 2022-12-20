@@ -155,6 +155,11 @@ path /landsraad/votes {
   }
 }
 
+path /landsraad/votingConfig {
+  read() { isSignedIn() }
+  write() { isSwiss() }
+}
+
 isControllingVotingRight(voting_right_id) {
   auth.uid == prior(root).landsraad.votingRights[voting_right_id].controlledBy
 }

@@ -133,6 +133,9 @@
         "controlledBy": "delegate_id_1"
       }
     },
+    "votingConfig": {
+      "resultsShown": true
+    },
     "questions": {
       "question_id_1": {
         "name": "Deploy Sardaukarů?"
