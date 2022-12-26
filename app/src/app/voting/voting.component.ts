@@ -20,6 +20,7 @@ export class VotingComponent implements OnInit {
   votingRights: Observable<VotingRight[]>
   voted = false
   questionId: string
+  showResults: boolean
 
   ngOnInit() {
     this.db.object("landsraad/currentQuestion").valueChanges().pipe(
@@ -35,7 +36,6 @@ export class VotingComponent implements OnInit {
               })
             })
         )
-
       })
     ).subscribe()
     let delegateId = this.auth.auth.currentUser.uid
@@ -48,7 +48,10 @@ export class VotingComponent implements OnInit {
           })
         })
     )
-
+    // TODO maybe change resultsShown to showResults also elsewhere as it sounds better
+    this.db.object("landsraad/votingConfig/resultsShown").valueChanges().subscribe((value: boolean) => {
+      this.showResults = value
+    })
   }
 
   vote(form: NgForm) {

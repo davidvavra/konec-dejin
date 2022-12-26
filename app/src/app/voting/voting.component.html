@@ -1,5 +1,8 @@
 <div class="tab-content">
-    <mat-card class="action">
+    <mat-card class="card" *ngIf="showResults">
+        Placeholder: Zde bude tabulka s výsledky.
+    </mat-card>
+    <mat-card class="action" *ngIf="!showResults">
         <p><strong>{{questionName | async}}</strong></p>
         <form (ngSubmit)="vote(votingForm)" #votingForm="ngForm">
             <ng-container *ngFor="let votingRight of votingRights | async">
