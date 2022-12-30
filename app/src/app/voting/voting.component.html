@@ -1,6 +1,22 @@
 <div class="tab-content">
     <mat-card class="card" *ngIf="showResults">
-        Placeholder: Zde bude tabulka s výsledky.
+        <div class="houses-pictures-row">Obrazky rodu</div>
+        <table mat-table [dataSource]="data">
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <ng-container matColumnDef="dekret">
+                <th mat-header-cell class="dekret-table-column" *matHeaderCellDef> Dekret </th>
+                <td mat-cell class="dekret-table-column" *matCellDef="let element"> {{element.dekret}} </td>
+            </ng-container>
+            <ng-container [matColumnDef]="column" *ngFor="let column of displayedHouses">
+                <th mat-header-cell class="regular-table-column" *matHeaderCellDef> {{column}} </th>
+                <td mat-cell class="regular-table-column" *matCellDef="let element"> {{element[column]}} </td>
+            </ng-container>
+            <ng-container matColumnDef="total">
+                <th mat-header-cell class="total-table-column" *matHeaderCellDef> Celkem hlasů na otázku</th>
+                <td mat-cell class="total-table-column" *matCellDef="let element"> {{element.total}} </td>
+            </ng-container>
+        </table>
     </mat-card>
     <mat-card class="action" *ngIf="!showResults">
         <p><strong>{{questionName | async}}</strong></p>
