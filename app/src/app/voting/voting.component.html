@@ -1,6 +1,11 @@
 <div class="tab-content">
     <mat-card class="card" *ngIf="showResults">
-        <div class="houses-pictures-row">Obrazky rodu</div>
+        <div class="current-question-name">{{questionName | async}}</div>
+        <div class="houses-icons-row">
+            <div class="house-icon" *ngFor="let column of displayedHouses">
+                <img cImg rounded src="assets/houses_icons/choam_{{column}}_160px.png"/>
+            </div>
+        </div>
         <table mat-table [dataSource]="data">
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
