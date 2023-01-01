@@ -146,7 +146,7 @@ path /landsraad/answers {
 }
 
 path /landsraad/votes {
-  read() { isSwiss() }
+  read() { isSwiss() || isSignedIn() }
   path /{question_id}/{voting_right_id} {
     delete() { isControllingVotingRight(voting_right_id) }
   }
