@@ -39,6 +39,7 @@ export class VotingComponent implements OnInit {
               })
             })
         )
+        this.composeData()
       })
     ).subscribe()
     let delegateId = this.auth.auth.currentUser.uid
@@ -51,18 +52,11 @@ export class VotingComponent implements OnInit {
           })
         })
     )
-    // TODO this is temp, displayedHouses, columns and data will be set in setData()
-    this.setData()
-    this.setDisplayedHouses()
-    console.log("houses", typeof(this.displayedHouses), this.displayedHouses)
-    this.setDisplayedColumns()
-    console.log("columns", typeof(this.displayedColumns), this.displayedColumns)
-    console.log("\nright", this.votingRights.pipe(take(1)))
     // TODO maybe change resultsShown to showResults also elsewhere as it sounds better
     this.db.object("landsraad/votingConfig/resultsShown").valueChanges().subscribe((value: boolean) => {
       this.showResults = value
       if (this.showResults) {
-        console.log("set data")
+        // TODO composeAndSetData ?
         this.composeData()
       }
     })
@@ -88,35 +82,64 @@ export class VotingComponent implements OnInit {
     // TODO this is deprecated, check how to refactor "to pipe to a map"
     combineLatest(
       this.db.list("landsraad/votes/" + this.questionId).snapshotChanges(),
-      this.db.list("landsraad/answers/"+this.questionId).snapshotChanges(),
+      this.db.list("landsraad/answers/" + this.questionId).snapshotChanges(),
       this.db.list("landsraad/votingRights").snapshotChanges(),
       (votes, answers, votingRights) => {
-        return { votes: votes, answers: answers, votingRights: votingRights }
+        return { 
+          votes: votes, answers: answers, votingRights: votingRights}
       }
     ).pipe(
       take(1),
       tap(
         combined => {
-          let data = combined.answers.map(answerSnap => {
-            let answerName = answerSnap.payload.val()["name"]
-            let answerId = answerSnap.key
-            let row = [answerName]
-            combined.votingRights.forEach(votingRightSnap => {
-              let votingRightId = votingRightSnap.key
-              row.push(findVote(combined.votes, votingRightId, answerId))
-              console.log("findVote", findVote(combined.votes, votingRightId, answerId))
-            })
-            return row
-          })
-          let headers = ["Odpověď"]
+          // voting right id to house names
+          let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
           combined.votingRights.forEach(votingRightSnap => {
-            headers.push(votingRightSnap.payload.val()["name"])
+            votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
           })
-          let options = {
-            headers: headers
-          };
-          console.log("combined")
-          console.log(combined)
+          // current question answers Ids to names
+          let currentQuestionAnswersMap: GenericFirebaseSnapshotMapping = {}
+          combined.answers.forEach((row) => {
+              currentQuestionAnswersMap[row.key] = row.payload.val()["name"]
+          })
+          // votes per house
+          let votesToDelegation: VoteToDelegationMap = {}
+          combined.votes.forEach(voteSnap => {
+            let answer = voteSnap.payload.val()
+            let answerId = Object.keys(answer)[0]
+            let votedBy = votingRightToHouseMap[voteSnap.key]
+            if (Object.keys(votesToDelegation).indexOf(votedBy) === -1) {
+              // house not yet in votesToDelegationMap - just add new answer object
+              votesToDelegation[votedBy] = [{
+                answer: currentQuestionAnswersMap[answerId],
+                answerId: answerId,
+                votes: answer[answerId]
+              }]
+            } else {
+              // house in the votesToDelegationMap, need to check which answers are present
+              let answers = votesToDelegation[votedBy]
+              let answerIndex = answers.findIndex(answer => answer.answerId === answerId)
+              if (answerIndex === -1) {
+                // answer not present - just add the new object
+                votesToDelegation[votedBy].push({
+                  answer: currentQuestionAnswersMap[answerId],
+                  answerId: answerId,
+                  votes: answer[answerId]
+                })
+              } else {
+                // answer present add the vote to the existing object
+                votesToDelegation[votedBy][answerIndex].votes = answers[answerIndex].votes + answer[answerId]
+              }
+            }
+          })
+
+          // TODO map votesToDelegation into answers and set this into data
+          // TODO rename votesToDelegation into votesToHouses
+          // TODO check that votesToDelegation is created correctly -> looks like yes
+          console.log("vote to delegation", votesToDelegation)
+          this.setDisplayedHouses([...new Set(Object.values(votingRightToHouseMap))].sort())
+          this.setDisplayedColumns()
+          this.setData()
         }
       )
     ).subscribe()
@@ -131,8 +154,8 @@ export class VotingComponent implements OnInit {
     ];
   }
 
-  setDisplayedHouses() {
-    this.displayedHouses = ["Yuzovka", "Fenring", "Atreides"]
+  setDisplayedHouses(houses: string[]) {
+    this.displayedHouses = houses
   }
 
   setDisplayedColumns() {
@@ -144,7 +167,7 @@ export class VotingComponent implements OnInit {
 
 }
 
-// TODO taken from swiss/src/app/question-form/question-form.components.ts -> should be refactored to common
+// TODO taken from swiss/src/app/question-form/question-form.components.ts -> should be refactored to common if to be used
 function findVote(snapshots: AngularFireAction<DatabaseSnapshot<any>>[], votingRightId: string, answerId: string) {
   let snapshot = snapshots.find((row) => row.key == votingRightId);
   if (snapshot == null) {
@@ -161,6 +184,20 @@ interface VotingRight {
   id: string,
   name: string,
   votes: number
+}
+
+interface GenericFirebaseSnapshotMapping {
+  [key: string]: string
+}
+
+interface Answer {
+  answer: string
+  answerId: string
+  votes: number
+}
+
+interface VoteToDelegationMap {
+  [key: string]: Answer[]
 }
 
 export interface TableRow {
