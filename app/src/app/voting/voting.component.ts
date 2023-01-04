@@ -92,66 +92,62 @@ export class VotingComponent implements OnInit {
       take(1),
       tap(
         combined => {
-          // voting right id to house names
+          // voting rights ids to house names
           let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
           combined.votingRights.forEach(votingRightSnap => {
             votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
           })
-          // current question answers Ids to names
+          // current question answers ids to names
           let currentQuestionAnswersMap: GenericFirebaseSnapshotMapping = {}
           combined.answers.forEach((row) => {
               currentQuestionAnswersMap[row.key] = row.payload.val()["name"]
           })
           // votes per house
-          let votesToDelegation: VoteToDelegationMap = {}
+          let votesByHouse: VoteByHouse = {}
+          let finalData: TableRow[] = [...Object.values(currentQuestionAnswersMap).map(answer => ({dekret: answer}))]
           combined.votes.forEach(voteSnap => {
             let answer = voteSnap.payload.val()
             let answerId = Object.keys(answer)[0]
-            let votedBy = votingRightToHouseMap[voteSnap.key]
-            if (Object.keys(votesToDelegation).indexOf(votedBy) === -1) {
-              // house not yet in votesToDelegationMap - just add new answer object
-              votesToDelegation[votedBy] = [{
-                answer: currentQuestionAnswersMap[answerId],
-                answerId: answerId,
-                votes: answer[answerId]
-              }]
-            } else {
-              // house in the votesToDelegationMap, need to check which answers are present
-              let answers = votesToDelegation[votedBy]
-              let answerIndex = answers.findIndex(answer => answer.answerId === answerId)
-              if (answerIndex === -1) {
-                // answer not present - just add the new object
-                votesToDelegation[votedBy].push({
-                  answer: currentQuestionAnswersMap[answerId],
-                  answerId: answerId,
-                  votes: answer[answerId]
-                })
-              } else {
-                // answer present add the vote to the existing object
-                votesToDelegation[votedBy][answerIndex].votes = answers[answerIndex].votes + answer[answerId]
-              }
-            }
+            let answerString: string = currentQuestionAnswersMap[answerId]
+            let votedBy: string = votingRightToHouseMap[voteSnap.key]
+            let votes = answer[answerId]
+            let answerIndexInData: number = finalData.findIndex(row => row.dekret === answerString)
+            // either create new entry in row or add votes to current
+            finalData[answerIndexInData].hasOwnProperty(votedBy) ? 
+              finalData[answerIndexInData][votedBy] = finalData[answerIndexInData][votedBy] + votes :
+                finalData[answerIndexInData][votedBy] = votes
+            // add votes per house
+            let voteInVotesByHouse = Object.keys(votesByHouse).includes(votedBy)
+            console.log("voteinvotes", voteInVotesByHouse, votedBy, votesByHouse, Object.keys(votesByHouse), votes)
+            voteInVotesByHouse ? 
+              votesByHouse[votedBy] = votes :
+                votesByHouse[votedBy] = votesByHouse[votedBy] + votes
           })
-
-          // TODO map votesToDelegation into answers and set this into data
-          // TODO rename votesToDelegation into votesToHouses
-          // TODO check that votesToDelegation is created correctly -> looks like yes
-          console.log("vote to delegation", votesToDelegation)
+          console.log("votes by house", votesByHouse)
+          // add total per answer
+          finalData = finalData.map((row: TableRow) => {
+            let total = Object.values(row)
+              .map(v => typeof(v) === "number" ? v : undefined)
+              .filter(v => v !== undefined)
+              .reduce((partialSum, a) => partialSum + a, 0)
+            return ({...row, total: total})
+          })
+          // add total per house
+          finalData.push({
+            ...votesByHouse, 
+            dekret: "Celkem hlasů na rod", 
+            total: Object.values(votesByHouse).reduce((partialSum, a) => partialSum + a, 0)})
+          console.log("final Data", finalData)
           this.setDisplayedHouses([...new Set(Object.values(votingRightToHouseMap))].sort())
           this.setDisplayedColumns()
-          this.setData()
+          this.setData(finalData)
         }
       )
     ).subscribe()
   }
 
-  setData() {
-    this.data = [
-      {dekret: "This is really loooooooooooooooooooo question", Yuzovka: 6, Fenring: 19, Atreides: 7, total: 32},
-      {dekret: "b", Yuzovka: 2, Fenring: 46, Atreides: 5, total: 53},
-      {dekret: "c", Yuzovka: 5, Fenring: 6, Atreides: 1, total: 12},
-      {dekret: "Celkem hlasů na rod", Yuzovka: 13, Fenring: 71, Atreides: 13, total: 97}
-    ];
+  setData(data: TableRow[]) {
+    this.data = data
   }
 
   setDisplayedHouses(houses: string[]) {
@@ -190,18 +186,12 @@ interface GenericFirebaseSnapshotMapping {
   [key: string]: string
 }
 
-interface Answer {
-  answer: string
-  answerId: string
-  votes: number
-}
-
-interface VoteToDelegationMap {
-  [key: string]: Answer[]
+interface VoteByHouse {
+  [key: string]: number
 }
 
 export interface TableRow {
   dekret: string;
-  total: number;
+  total?: number;
   [key: string]: string | number;
 }
