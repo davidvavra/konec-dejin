@@ -39,7 +39,7 @@ export class VotingComponent implements OnInit {
               })
             })
         )
-        this.composeData()
+        this.composeAndSetData()
       })
     ).subscribe()
     let delegateId = this.auth.auth.currentUser.uid
@@ -52,12 +52,10 @@ export class VotingComponent implements OnInit {
           })
         })
     )
-    // TODO maybe change resultsShown to showResults also elsewhere as it sounds better
     this.db.object("landsraad/votingConfig/resultsShown").valueChanges().subscribe((value: boolean) => {
       this.showResults = value
       if (this.showResults) {
-        // TODO composeAndSetData ?
-        this.composeData()
+        this.composeAndSetData()
       }
     })
   }
@@ -78,8 +76,7 @@ export class VotingComponent implements OnInit {
     }
   }
 
-  composeData() {
-    // TODO this is deprecated, check how to refactor "to pipe to a map"
+  composeAndSetData() {
     combineLatest(
       this.db.list("landsraad/votes/" + this.questionId).snapshotChanges(),
       this.db.list("landsraad/answers/" + this.questionId).snapshotChanges(),
@@ -89,14 +86,19 @@ export class VotingComponent implements OnInit {
           votes: votes, answers: answers, votingRights: votingRights}
       }
     ).pipe(
-      take(1),
       tap(
         combined => {
           // voting rights ids to house names
           let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
           combined.votingRights.forEach(votingRightSnap => {
-            votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
+            // malorod is for testing, skipping for the general table
+            let houseName = votingRightSnap.payload.val()["name"].split(" ")[0]
+            if (houseName.toLowerCase() === "malorod") {
+              return
+            }
+            votingRightToHouseMap[votingRightSnap.key] = houseName
           })
+
           // current question answers ids to names
           let currentQuestionAnswersMap: GenericFirebaseSnapshotMapping = {}
           combined.answers.forEach((row) => {
@@ -116,14 +118,12 @@ export class VotingComponent implements OnInit {
             finalData[answerIndexInData].hasOwnProperty(votedBy) ? 
               finalData[answerIndexInData][votedBy] = finalData[answerIndexInData][votedBy] + votes :
                 finalData[answerIndexInData][votedBy] = votes
-            // add votes per house
+            // add total row
             let voteInVotesByHouse = Object.keys(votesByHouse).includes(votedBy)
-            console.log("voteinvotes", voteInVotesByHouse, votedBy, votesByHouse, Object.keys(votesByHouse), votes)
-            voteInVotesByHouse ? 
-              votesByHouse[votedBy] = votes :
-                votesByHouse[votedBy] = votesByHouse[votedBy] + votes
+            voteInVotesByHouse ?
+              votesByHouse[votedBy] = votesByHouse[votedBy] + votes :
+                votesByHouse[votedBy] = votes
           })
-          console.log("votes by house", votesByHouse)
           // add total per answer
           finalData = finalData.map((row: TableRow) => {
             let total = Object.values(row)
@@ -132,12 +132,11 @@ export class VotingComponent implements OnInit {
               .reduce((partialSum, a) => partialSum + a, 0)
             return ({...row, total: total})
           })
-          // add total per house
+          // add total for total row
           finalData.push({
             ...votesByHouse, 
             dekret: "Celkem hlasů na rod", 
             total: Object.values(votesByHouse).reduce((partialSum, a) => partialSum + a, 0)})
-          console.log("final Data", finalData)
           this.setDisplayedHouses([...new Set(Object.values(votingRightToHouseMap))].sort())
           this.setDisplayedColumns()
           this.setData(finalData)
