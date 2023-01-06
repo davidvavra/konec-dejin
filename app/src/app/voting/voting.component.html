@@ -4,7 +4,7 @@
         <div class="current-question-name">{{questionName | async}}</div>
         <div class="houses-icons-row">
             <div class="house-icon" *ngFor="let column of displayedHouses">
-                <img cImg rounded src="assets/houses_icons/choam_{{column}}_160px.png"/>
+                <img cImg rounded src="assets/houses_icons/choam_{{column}}_160px.png" alt="House {{column}}"/>
             </div>
         </div>
         <table mat-table [dataSource]="data">
