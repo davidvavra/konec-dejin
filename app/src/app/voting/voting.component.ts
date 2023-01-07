@@ -126,8 +126,7 @@ export class VotingComponent implements OnInit {
           // add total per answer
           finalData = finalData.map((row: TableRow) => {
             let total = Object.values(row)
-              .map(v => typeof(v) === "number" ? v : undefined)
-              .filter(v => v !== undefined)
+              .map(v => typeof(v) === "number" ? v : 0)
               .reduce((partialSum, a) => partialSum + a, 0)
             return ({...row, total: total})
           })
@@ -159,19 +158,6 @@ export class VotingComponent implements OnInit {
     this.displayedColumns = columns
   }
 
-}
-
-// TODO taken from swiss/src/app/question-form/question-form.components.ts -> should be refactored to common if to be used
-function findVote(snapshots: AngularFireAction<DatabaseSnapshot<any>>[], votingRightId: string, answerId: string) {
-  let snapshot = snapshots.find((row) => row.key == votingRightId);
-  if (snapshot == null) {
-    return ""
-  }
-  let votes = snapshot.payload.val()[answerId]
-  if (votes == null) {
-    return ""
-  }
-  return votes
 }
 
 interface VotingRight {
