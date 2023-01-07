@@ -39,7 +39,7 @@ export class VotingComponent implements OnInit {
               })
             })
         )
-        this.composeAndSetData()
+        this.subscribeToVotingResults()
       })
     ).subscribe()
     let delegateId = this.auth.auth.currentUser.uid
@@ -55,7 +55,8 @@ export class VotingComponent implements OnInit {
     this.db.object("landsraad/votingConfig/resultsShown").valueChanges().subscribe((value: boolean) => {
       this.showResults = value
       if (this.showResults) {
-        this.composeAndSetData()
+        this.subscribeToVotingResults()
+    
       }
     })
   }
@@ -76,7 +77,7 @@ export class VotingComponent implements OnInit {
     }
   }
 
-  composeAndSetData() {
+  subscribeToVotingResults() {
     combineLatest(
       this.db.list("landsraad/votes/" + this.questionId).snapshotChanges(),
       this.db.list("landsraad/answers/" + this.questionId).snapshotChanges(),
