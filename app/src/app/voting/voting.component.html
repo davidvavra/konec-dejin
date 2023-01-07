@@ -1,6 +1,5 @@
 <div class="tab-content">
     <mat-card class="card" *ngIf="showResults">
-        <!--TODO with many houses table gets out of hand, think of something-->
         <div class="current-question-name">{{questionName | async}}</div>
         <div class="houses-icons-row">
             <div class="house-icon" *ngFor="let column of displayedHouses">

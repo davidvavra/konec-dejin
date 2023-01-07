@@ -23,7 +23,7 @@ export class VotingComponent implements OnInit {
   showResults: boolean
   data: TableRow[]
   displayedColumns: string[]
-  displayedHouses: string[]  // all the delegations with voting right to the question
+  displayedHouses: string[]
 
   ngOnInit() {
     this.db.object("landsraad/currentQuestion").valueChanges().pipe(
@@ -91,12 +91,7 @@ export class VotingComponent implements OnInit {
           // voting rights ids to house names
           let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
           combined.votingRights.forEach(votingRightSnap => {
-            // malorod is for testing, skipping for the general table
-            let houseName = votingRightSnap.payload.val()["name"].split(" ")[0]
-            if (houseName.toLowerCase() === "malorod") {
-              return
-            }
-            votingRightToHouseMap[votingRightSnap.key] = houseName
+            votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
           })
 
           // current question answers ids to names
@@ -115,14 +110,18 @@ export class VotingComponent implements OnInit {
             let votes = answer[answerId]
             let answerIndexInData: number = finalData.findIndex(row => row.dekret === answerString)
             // either create new entry in row or add votes to current
-            finalData[answerIndexInData].hasOwnProperty(votedBy) ? 
-              finalData[answerIndexInData][votedBy] = finalData[answerIndexInData][votedBy] + votes :
-                finalData[answerIndexInData][votedBy] = votes
+            if (finalData[answerIndexInData].hasOwnProperty(votedBy)) {
+              finalData[answerIndexInData][votedBy] = finalData[answerIndexInData][votedBy] + votes
+            } else {
+              finalData[answerIndexInData][votedBy] = votes
+            }
             // add total row
             let voteInVotesByHouse = Object.keys(votesByHouse).includes(votedBy)
-            voteInVotesByHouse ?
-              votesByHouse[votedBy] = votesByHouse[votedBy] + votes :
-                votesByHouse[votedBy] = votes
+            if (voteInVotesByHouse) {
+              votesByHouse[votedBy] = votesByHouse[votedBy] + votes
+            } else {
+              votesByHouse[votedBy] = votes
+            }
           })
           // add total per answer
           finalData = finalData.map((row: TableRow) => {
