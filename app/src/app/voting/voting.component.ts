@@ -102,6 +102,8 @@ export class VotingComponent implements OnInit {
           // voting rights ids to house names
           let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
           combined.votingRights.forEach(votingRightSnap => {
+            // take in only the first part of the name, houses with more delegates will have same house name for each delegate
+            // this is used later when matching votes by house name (for example for Atreides and Harkonnens)
             votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
           })
           // votes per house
@@ -116,15 +118,19 @@ export class VotingComponent implements OnInit {
             let answerIndexInData: number = finalData.findIndex(row => row.dekret === answerString)
             // either create new entry in row or add votes to current
             if (finalData[answerIndexInData].hasOwnProperty(votedBy)) {
+              // houses with more voting delegates, add their votes if they answer the same way
               finalData[answerIndexInData][votedBy] = finalData[answerIndexInData][votedBy] + votes
             } else {
+              // house with single voting delegate
               finalData[answerIndexInData][votedBy] = votes
             }
             // add total row
             let voteInVotesByHouse = Object.keys(votesByHouse).includes(votedBy)
             if (voteInVotesByHouse) {
+              // houses with more voting delegates, add their votes together
               votesByHouse[votedBy] = votesByHouse[votedBy] + votes
             } else {
+              // other houses with single voting delegate
               votesByHouse[votedBy] = votes
             }
           })
