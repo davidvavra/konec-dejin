@@ -1,5 +1,29 @@
 <div class="tab-content">
-    <mat-card class="action">
+    <mat-card class="card" *ngIf="showResults">
+        <div class="current-question-name">{{questionName | async}}</div>
+        <div class="houses-icons-row">
+            <div class="house-icon" *ngFor="let column of displayedHouses">
+                <img cImg rounded src="assets/houses_icons/choam_{{column}}_160px.png" alt="House {{column}}"/>
+            </div>
+        </div>
+        <table mat-table [dataSource]="data">
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <ng-container matColumnDef="dekret">
+                <th mat-header-cell class="dekret-table-column" *matHeaderCellDef> Dekret </th>
+                <td mat-cell class="dekret-table-column" *matCellDef="let element"> {{element.dekret}} </td>
+            </ng-container>
+            <ng-container [matColumnDef]="column" *ngFor="let column of displayedHouses">
+                <th mat-header-cell class="regular-table-column" *matHeaderCellDef> {{column}} </th>
+                <td mat-cell class="regular-table-column" *matCellDef="let element"> {{element[column]}} </td>
+            </ng-container>
+            <ng-container matColumnDef="total">
+                <th mat-header-cell class="total-table-column" *matHeaderCellDef> Celkem hlasů na otázku</th>
+                <td mat-cell class="total-table-column" *matCellDef="let element"> {{element.total}} </td>
+            </ng-container>
+        </table>
+    </mat-card>
+    <mat-card class="action" *ngIf="!showResults">
         <p><strong>{{questionName | async}}</strong></p>
         <form (ngSubmit)="vote(votingForm)" #votingForm="ngForm">
             <ng-container *ngFor="let votingRight of votingRights | async">

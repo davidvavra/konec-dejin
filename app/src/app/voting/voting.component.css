@@ -18,3 +18,130 @@
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
+.current-question-name {
+  padding: 5px 1px;
+  margin-bottom: 5px;
+  background: #ffa000;
+  color: #060100;
+  border-radius: 10px;
+  font-family: Verdana, sans-serif;
+  font-size: 18px;
+  font-weight: 1000;
+  text-align: center;
+}
+
+.houses-icons-row {
+  padding-left: 237px;
+  display: flex;
+  flex-direction: row;
+}
+
+.house-icon {
+  width: 10em;
+  min-width: 65px;
+  max-width: 85px;
+  padding: 5px 10px;
+  padding-left: 11px;
+}
+
+.house-icon>img {
+  width: 100%;
+}
+
+.mat-table {
+  width: 100%;
+  font-family: Verdana, sans-serif;
+  line-height: normal;
+  border-collapse:separate;
+  border:solid #424242 3px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.mat-header-row {
+  background: #ffa000;
+  height: 24px;
+}
+
+.mat-row {
+  height: 24px;
+}
+
+tr.mat-row:last-child {
+  background: #ffa000;
+  font-weight: 600;
+}
+
+tr.mat-row:last-child>td.mat-cell {
+  color: #060100;
+  font-size: 14px;
+}
+
+tr:not(:last-child)>td.total-table-column {
+  background: #353535;
+}
+
+tr:not(:last-child)>td.regular-table-column {
+  background: #5c5c5c;
+}
+
+tr:not(:last-child)>td.dekret-table-column {
+  background: #5c5c5c;
+}
+
+.mat-header-cell {
+  color: #060100;
+  font-weight: 600;
+  font-size: 14px;
+  height: 24px;
+}
+
+.mat-cell {
+  height: 24px;
+}
+
+.dekret-table-column {
+  padding: 5px 10px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  font-size: 12px;
+  text-align: left;
+}
+
+th.dekret-table-column {
+  font-size: 14px;
+}
+
+.regular-table-column {
+  padding: 5px 10px;
+  text-align: center;
+  border-left-color: rgba(255, 255, 255, 0.12);
+  border-left-width: 1px;
+  border-left-style: solid;
+  width: 10em;
+  min-width: 65px;
+  max-width: 85px;
+}
+
+th.regular-table-column {
+  border-left-color: #060100;
+  border-left-width: 1px;
+  border-left-style: solid;
+}
+
+.total-table-column {
+  padding: 5px 10px;
+  text-align: right;
+  font-weight: 600;
+  border-left-color: #060100;
+  border-left-width: 1px;
+  border-left-style: solid;
+}
+
+tr.mat-row:last-child>td.regular-table-column {
+  border-left-color: #060100;
+  border-left-width: 1px;
+  border-left-style: solid;
+}

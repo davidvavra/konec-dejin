@@ -21,6 +21,7 @@ export class LandsraadComponent implements OnInit {
   currentQuestion: Observable<string>
   alreadyVotedCount: Observable<number>
   maxVotedCount: Observable<number>
+  resultsShown: Observable<boolean>
 
   constructor(public db: AngularFireDatabase) { }
 
@@ -60,6 +61,7 @@ export class LandsraadComponent implements OnInit {
       )
     }))
     this.maxVotedCount = this.votingRightPaths.pipe(map(items => items.length))
+    this.resultsShown = this.db.object("landsraad/votingConfig/resultsShown").valueChanges() as Observable<boolean>
   }
 
   addVotingRight(form: NgForm) {
@@ -89,5 +91,10 @@ export class LandsraadComponent implements OnInit {
 
   currentQuestionChanged(event) {
     this.db.object("landsraad/currentQuestion").set(event.value)
+  }
+
+  toggleVotingCheckbox(event) {
+    this.resultsShown = event.checked
+    this.db.object("landsraad/votingConfig/resultsShown").set(event.checked)
   }
 }

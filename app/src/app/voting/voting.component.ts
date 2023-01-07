@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireAction, AngularFireDatabase, DatabaseSnapshot } from '@angular/fire/database';
 import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { ValueName } from '../../../../common/config';
 
@@ -20,6 +20,10 @@ export class VotingComponent implements OnInit {
   votingRights: Observable<VotingRight[]>
   voted = false
   questionId: string
+  showResults: boolean
+  data: TableRow[]
+  displayedColumns: string[]
+  displayedHouses: string[]
 
   ngOnInit() {
     this.db.object("landsraad/currentQuestion").valueChanges().pipe(
@@ -35,7 +39,7 @@ export class VotingComponent implements OnInit {
               })
             })
         )
-
+        this.subscribeToVotingResults()
       })
     ).subscribe()
     let delegateId = this.auth.auth.currentUser.uid
@@ -48,7 +52,13 @@ export class VotingComponent implements OnInit {
           })
         })
     )
-
+    this.db.object("landsraad/votingConfig/resultsShown").valueChanges().subscribe((value: boolean) => {
+      this.showResults = value
+      if (this.showResults) {
+        this.subscribeToVotingResults()
+    
+      }
+    })
   }
 
   vote(form: NgForm) {
@@ -67,10 +77,114 @@ export class VotingComponent implements OnInit {
     }
   }
 
+  subscribeToVotingResults() {
+    combineLatest(
+      this.db.list("landsraad/votes/" + this.questionId).snapshotChanges(),
+      this.db.list("landsraad/answers/" + this.questionId).snapshotChanges(),
+      this.db.list("landsraad/votingRights").snapshotChanges(),
+      (votes, answers, votingRights) => {
+        return { 
+          votes: votes, answers: answers, votingRights: votingRights}
+      }
+    ).pipe(
+      tap(
+        combined => {
+          // current question answers ids to names
+          let currentQuestionAnswersMap: GenericFirebaseSnapshotMapping = {}
+          combined.answers.forEach((row) => {
+              currentQuestionAnswersMap[row.key] = row.payload.val()["name"]
+          })
+          // check if we have some current question answers, if not set empty data and return
+          if (Object.values(currentQuestionAnswersMap).filter(answer => answer !== undefined).length === 0) {
+            this.setData(null, [])
+            return
+          }
+          // voting rights ids to house names
+          let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
+          combined.votingRights.forEach(votingRightSnap => {
+            votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
+          })
+          // votes per house
+          let votesByHouse: VoteByHouse = {}
+          let finalData: TableRow[] = [...Object.values(currentQuestionAnswersMap).map(answer => ({dekret: answer}))]
+          combined.votes.forEach(voteSnap => {
+            let answer = voteSnap.payload.val()
+            let answerId = Object.keys(answer)[0]
+            let answerString: string = currentQuestionAnswersMap[answerId]
+            let votedBy: string = votingRightToHouseMap[voteSnap.key]
+            let votes = answer[answerId]
+            let answerIndexInData: number = finalData.findIndex(row => row.dekret === answerString)
+            // either create new entry in row or add votes to current
+            if (finalData[answerIndexInData].hasOwnProperty(votedBy)) {
+              finalData[answerIndexInData][votedBy] = finalData[answerIndexInData][votedBy] + votes
+            } else {
+              finalData[answerIndexInData][votedBy] = votes
+            }
+            // add total row
+            let voteInVotesByHouse = Object.keys(votesByHouse).includes(votedBy)
+            if (voteInVotesByHouse) {
+              votesByHouse[votedBy] = votesByHouse[votedBy] + votes
+            } else {
+              votesByHouse[votedBy] = votes
+            }
+          })
+          // add total per answer
+          finalData = finalData.map((row: TableRow) => {
+            let total = Object.values(row)
+              .map(v => typeof(v) === "number" ? v : 0)
+              .reduce((partialSum, a) => partialSum + a, 0)
+            return ({...row, total: total})
+          })
+          // add total for total row
+          finalData.push({
+            ...votesByHouse, 
+            dekret: "Celkem hlasů na rod", 
+            total: Object.values(votesByHouse).reduce((partialSum, a) => partialSum + a, 0)})
+          this.setData(finalData, [...new Set(Object.values(votingRightToHouseMap))].sort())
+        }
+      )
+    ).subscribe()
+  }
+
+  setData(data: TableRow[], displayedHouses: string[]) {
+    this.setDisplayedHouses(displayedHouses)
+    this.setDisplayedColumns()
+    this.setTableData(data)
+  }
+
+  setTableData(data: TableRow[]) {
+    this.data = data
+  }
+
+  setDisplayedHouses(houses: string[]) {
+    this.displayedHouses = houses
+  }
+
+  setDisplayedColumns() {
+    let columns = this.displayedHouses.slice()
+    columns.unshift("dekret")
+    columns.push("total")
+    this.displayedColumns = columns
+  }
+
 }
 
 interface VotingRight {
   id: string,
   name: string,
   votes: number
+}
+
+interface GenericFirebaseSnapshotMapping {
+  [key: string]: string
+}
+
+interface VoteByHouse {
+  [key: string]: number
+}
+
+export interface TableRow {
+  dekret: string;
+  total?: number;
+  [key: string]: string | number;
 }

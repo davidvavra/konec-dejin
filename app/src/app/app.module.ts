@@ -26,6 +26,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatTableModule } from '@angular/material';
 import { ProcessingRoundComponent } from './processing-round/processing-round.component';
 import { VotingComponent } from './voting/voting.component';
 import { UnitsComponent } from './units/units.component';
@@ -52,6 +53,7 @@ import { UnitsComponent } from './units/units.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,
+    MatTableModule,
     MatTabsModule,
     MatCardModule,
     MatFormFieldModule,
