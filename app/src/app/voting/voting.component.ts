@@ -88,16 +88,20 @@ export class VotingComponent implements OnInit {
     ).pipe(
       tap(
         combined => {
-          // voting rights ids to house names
-          let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
-          combined.votingRights.forEach(votingRightSnap => {
-            votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
-          })
-
           // current question answers ids to names
           let currentQuestionAnswersMap: GenericFirebaseSnapshotMapping = {}
           combined.answers.forEach((row) => {
               currentQuestionAnswersMap[row.key] = row.payload.val()["name"]
+          })
+          // check if we have some current question answers, if not set empty data and return
+          if (Object.values(currentQuestionAnswersMap).filter(answer => answer !== undefined).length === 0) {
+            this.setData(null, [])
+            return
+          }
+          // voting rights ids to house names
+          let votingRightToHouseMap: GenericFirebaseSnapshotMapping = {}
+          combined.votingRights.forEach(votingRightSnap => {
+            votingRightToHouseMap[votingRightSnap.key] = votingRightSnap.payload.val()["name"].split(" ")[0]
           })
           // votes per house
           let votesByHouse: VoteByHouse = {}
@@ -135,15 +139,19 @@ export class VotingComponent implements OnInit {
             ...votesByHouse, 
             dekret: "Celkem hlasů na rod", 
             total: Object.values(votesByHouse).reduce((partialSum, a) => partialSum + a, 0)})
-          this.setDisplayedHouses([...new Set(Object.values(votingRightToHouseMap))].sort())
-          this.setDisplayedColumns()
-          this.setData(finalData)
+          this.setData(finalData, [...new Set(Object.values(votingRightToHouseMap))].sort())
         }
       )
     ).subscribe()
   }
 
-  setData(data: TableRow[]) {
+  setData(data: TableRow[], displayedHouses: string[]) {
+    this.setDisplayedHouses(displayedHouses)
+    this.setDisplayedColumns()
+    this.setTableData(data)
+  }
+
+  setTableData(data: TableRow[]) {
     this.data = data
   }
 
