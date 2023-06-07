@@ -16,10 +16,10 @@ export class BasicInfoComponent implements OnInit {
   title = "Duna: Válka Assasinů"
 
   signUp() {
-    window.location.href = "https://forms.gle/GfvWwHbnTVzD9yPu6"
+    window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSfT83hkBZmbaiyqlHhlfLD4xcYpS7vaTKKBthOZh-MpfaE4KQ/viewform?usp=sf_link"
   }
 
   factions() {
-    window.location.href = "https://drive.google.com/file/d/1FXN7Kq3A16ejNjy29b2BMBiraP9dUPEV/view?usp=sharing"
+    window.location.href = "https://docs.google.com/document/d/13cSDRGej7Rt57btu0M_lW-mvDDAm1xd9ozMEO4JLSKg/edit?usp=sharing"
   }
 }
