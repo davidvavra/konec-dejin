@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { COUNTRIES, VISIBILITIES, ACTION_TYPES, VISIBILITIES_PRIMARY, ValueName } from '../../../../common/config';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { map, take, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { JsonpClientBackend } from '@angular/common/http';
