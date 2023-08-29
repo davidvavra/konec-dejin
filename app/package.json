@@ -29,6 +29,7 @@
     "cross-spawn": "^7.0.3",
     "firebase": "^6.6.1",
     "inquirer": "^9.2.10",
+    "normalize-package-data": "^6.0.0",
     "p-locate": "^6.0.0",
     "request": "^2.88.2",
     "rxjs": "~6.5.3",
