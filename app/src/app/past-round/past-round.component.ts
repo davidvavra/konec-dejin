@@ -26,23 +26,21 @@ export class PastRoundComponent implements OnInit {
   spentDf = new BehaviorSubject<number>(0)
 
   ngOnInit() {
-    let delegationActions = this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/delegation").valueChanges().pipe(
-      flatMap((delegationId, _) => {
-        return this.db.list("actions/" + this.roundId, ref => ref.orderByChild("delegation").equalTo(delegationId as string)).valueChanges().pipe(tap(
+    let delegateActions = this.db.list("actions/" + this.roundId, ref => {
+          return ref.orderByChild("delegate").equalTo(this.delegateId as string)}).valueChanges().pipe(tap(
           vals => {
-            let spentDf
+            let spentDf: number
             if (vals.length == 0) {
               spentDf = 0
             } else {
-              spentDf = vals.map(val => val["df"] || 0).reduce((sum, current) => sum + current)
+              spentDf = vals.map(val => val["df"] || 0).reduce((sum, current) => {
+                return sum + current})
             }
             this.spentDf.next(spentDf)
           }
         ))
-      })
-    )
-    this.primaryActions = delegationActions.pipe(map(actions => {
-      return actions.filter(action => (action["type"] == "mission" || action["type"] == "other" || action["type"] == "unit") && !this.isSecretForMe(action)).map(action => action as Action)
+    this.primaryActions = delegateActions.pipe(map(actions => {
+      return actions.filter(action => (action["type"] == "mission" || action["type"] == "other" || action["type"] == "unit")).map(action => action as Action)
     }))
   }
 
@@ -63,11 +61,6 @@ export class PastRoundComponent implements OnInit {
     }
     return details
   }
-
-  isSecretForMe(action: {}) {
-    return action["visibility"] == "private" && action["delegate"] != this.delegateId 
-  }
-
 }
 
 function isBlank(str) {
