@@ -30,6 +30,7 @@ import { MatTableModule } from '@angular/material';
 import { ProcessingRoundComponent } from './processing-round/processing-round.component';
 import { VotingComponent } from './voting/voting.component';
 import { UnitsComponent } from './units/units.component';
+import { DecretFormComponent } from './decret-form/decret-form.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { UnitsComponent } from './units/units.component';
     DelegateNameComponent,
     ProcessingRoundComponent,
     VotingComponent,
-    UnitsComponent
+    UnitsComponent,
+    DecretFormComponent
   ],
   imports: [
     BrowserModule,

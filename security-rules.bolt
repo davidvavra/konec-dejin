@@ -60,6 +60,10 @@ path /delegateRounds {
   path /{delegate_id}/{round_id}/markedAsSent is Boolean {
     write() { isSameDelegate(delegate_id) }
   }
+
+  path /{delegate_id}/{round_id}/markedDecreeAsSent is Boolean {
+    write() { isSameDelegate(delegate_id) }
+  }
 }
 
 //
@@ -137,12 +141,12 @@ path /landsraad/votingRights {
 
 path /landsraad/questions {
   read() { isSignedIn() }
-  write() { isSwiss() }
+  write() { isSignedIn() }
 }
 
 path /landsraad/answers {
   read() { isSignedIn() }
-  write() { isSwiss() }
+  write() { isSignedIn() }
 }
 
 path /landsraad/votes {

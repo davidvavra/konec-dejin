@@ -5,6 +5,7 @@ import { NgForm } from '@angular/forms';
 import { combineLatest, Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { ValueName } from '../../../../common/config';
+import { VotingRight } from '../model';
 
 @Component({
   selector: 'app-voting',
@@ -173,12 +174,6 @@ export class VotingComponent implements OnInit {
     this.displayedColumns = columns
   }
 
-}
-
-interface VotingRight {
-  id: string,
-  name: string,
-  votes: number
 }
 
 interface GenericFirebaseSnapshotMapping {

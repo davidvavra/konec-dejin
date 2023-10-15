@@ -43,7 +43,12 @@ export class LandsraadComponent implements OnInit {
     this.questionPaths = this.db.list("landsraad/questions").snapshotChanges().pipe(
       map(
         snapshots => {
-          return snapshots.map(snapshot => "landsraad/questions/" + snapshot.key)
+          let snapshotsFiltered = snapshots.filter(snap => {
+            const question = snap.payload.val()
+            // as we now have to fill-in DB object even if no decret is selected, filter out "no selected" decret
+            return question["decretType"] !== "- Žádný -"
+          })
+          return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
         })
     )
     this.questions = this.db.list("landsraad/questions").snapshotChanges().pipe(
@@ -77,6 +82,7 @@ export class LandsraadComponent implements OnInit {
   addQuestion(form: NgForm) {
     if (form.valid) {
       let ref = this.db.list("landsraad/questions").push({
+        decretType: "Hlas Landsraadu",
         name: form.value["name"]
       });
       (form.value["answers"] as string).split(",").forEach(

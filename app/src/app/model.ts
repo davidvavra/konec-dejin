@@ -52,3 +52,23 @@ export interface Unit {
     visibility: string,
     description: string
 }
+
+export interface VotingRight {
+    id: string,
+    name: string,
+    votes: number
+  }
+
+export interface VotingRightWithPath extends VotingRight {
+    dbPath: string
+}
+
+export interface AvailableQuestion {
+    id: string,
+    name: string,
+    decretType: string,
+    byDelegateId: string,
+    byHouse: string,
+    roundId: string,
+    hidden: boolean,
+}

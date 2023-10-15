@@ -33,6 +33,7 @@ export class RoundDelegateFormComponent implements OnInit {
       delegation: [''],
       mainActions: [0],
       markedAsSent: [false],
+      markedDecreeAsSent: [false],
       bv: [0],
       message: ['']
     })

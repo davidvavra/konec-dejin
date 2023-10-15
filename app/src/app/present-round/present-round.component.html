@@ -9,3 +9,15 @@
 (Všechny změny v depeši se ukládají automaticky. Kliknutím na "Odeslat depeši" dáváte najevo, že depeše je
 kompletní a může začít vyhodnocování. Můžete vše editovat i po odeslání, ale může se stát že už se na to ve vyhodnocování nebude brát zřetel. Vyhodnocování také začne po deadlinu i pokud jste depeši neodeslali. Pokud
 potřebujete více času, napište na Slacku.)</p>
+<br />
+<app-decret-form *ngFor="let house of controlledVotingRights | async" [house]="house" [roundId]="roundId" [delegateId]="delegateId"></app-decret-form>
+<br />
+<button mat-raised-button color="accent" *ngIf="!(markedDecreeAsSent | async) else decreeSent" (click)="sendDecree()">Odeslat návrh dekretů</button>
+<ng-template #decreeSent>
+  <p><strong>Návrh dekretů odeslán</strong></p>
+</ng-template>
+<p>
+(Všechny změny v dekretech se ukládají automaticky. Kliknutím na "Odeslat návrh dekretů" dáváte najevo, že návrh dekretů je
+kompletní a může začít vyhodnocování. Můžete vše editovat i po odeslání, ale může se stát že už se na to ve vyhodnocování nebude brát zřetel. Vyhodnocování také začne po deadlinu i pokud jste návrh dekretu neodeslali. Pokud
+potřebujete více času na návrh dekretů, napište na Slacku.)</p>
+<br />

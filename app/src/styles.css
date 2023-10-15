@@ -14,7 +14,7 @@ body { margin: 0;
     flex: 1 1 auto;
 }
 
-.action {
+.action, .decret {
     margin-bottom: 1em;
 }
 .tab-content {

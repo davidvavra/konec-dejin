@@ -78,6 +78,37 @@ export const UNIT_VISIBILITIES: ValueName[] = [
     { value: 'fremen', name: "Fremenská" }
 ]
 
+export const ALL_DECREE: string[] = [
+    "Mandát sardaukarů",
+    "Zrušení mandátu sardaukarů",
+    "Vyslání vojsk Landsraadu",
+    "Změna mandátu vojsk Landsraadu",
+    "Stažení vojsk Landsraadu",
+    "Zřízení vyšetřovací komise",
+    "Přerozdělení podílů CHOAM",
+    "Uvalení embarga",
+    "Zrušení embarga",
+    "Změna kvót",
+    "Jiný",
+    "- Žádný -"
+]
+
+export const SPECIAL_DECREE: string[] = [
+    "Bill of Particulars",
+    "- Žádný -"
+]
+
+export const NEUTRAL_HOUSES: string[] = [
+    "Destrym",
+    "Genissai",
+    "Hajns",
+    "Masjed",
+    "Menemtahe",
+    "Riches",
+    "Samarama",
+    "Yuzovka"
+]
+
 export interface ValueName {
     value: string;
     name: string;

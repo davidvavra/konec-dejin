@@ -1,0 +1,19 @@
+<p><strong>{{title}}</strong></p>
+<mat-card>
+    <form [formGroup]="decretForm" appFireForm [path]="questionsPath" (stateChange)="changeHandler($event)">
+        <mat-form-field class="decret">
+            <mat-label>Typ dekretu</mat-label>
+            <mat-select formControlName="decretType">
+                <mat-option *ngFor="let type of allDecree" [value]="type">
+                    {{type}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <p class="decretDescription">
+            <mat-form-field>
+                <input matInput placeholder="Krátký popis dekretu" type="text" formControlName="name">
+            </mat-form-field>
+        </p>
+    </form>
+    <mat-card-footer class="state mat-small">{{state}}</mat-card-footer>
+</mat-card>

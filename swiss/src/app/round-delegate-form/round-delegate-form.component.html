@@ -16,7 +16,9 @@
         BV použito
     </ng-container> | 
     <span class="positive" *ngIf="delegateForm.controls.markedAsSent.value">Depeše odeslána</span>
-    <span class="negative" *ngIf="!delegateForm.controls.markedAsSent.value">Depeše neodeslána</span>
+    <span class="negative" *ngIf="!delegateForm.controls.markedAsSent.value">Depeše neodeslána</span> |
+    <span class="positive" *ngIf="delegateForm.controls.markedDecreeAsSent.value">Dekret odeslán</span>
+    <span class="negative" *ngIf="!delegateForm.controls.markedDecreeAsSent.value">Dekret neodeslán</span>
     <br />
     <mat-form-field class="message">
         <textarea matInput placeholder="Důležitá sdělení vedení" formControlName="message"></textarea>
