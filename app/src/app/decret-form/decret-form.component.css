@@ -1,0 +1,19 @@
+
+.questionDescription {
+    margin: 0;
+}
+
+mat-form-field {
+    width:100%;
+}
+
+.question {
+    width: 350px;
+}
+
+.state {
+    text-align: right;
+    color: grey;
+    padding-bottom: 3px;
+    padding-right: 5px;
+}

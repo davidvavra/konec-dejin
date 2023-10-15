@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm } from '@angular/forms';
-import { TENSES, COUNTRIES, findValueName, ACTION_TYPES, VISIBILITIES, SIZES, ValueName } from '../../../../common/config';
+import { TENSES, COUNTRIES, findValueName, SIZES, ValueName } from '../../../../common/config';
 import { AngularFireDatabase, DatabaseSnapshot, AngularFireAction } from '@angular/fire/database';
 import { Observable, combineLatest } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
@@ -327,6 +327,60 @@ export class RoundComponent implements OnInit {
         }
       }
     )
+  }
+
+  setQuestions() {
+    this.dialog.open(DeleteConfirmDialogComponent, 
+      {data: "všech dekretů v tomto kole a vytvoření nových prázdných (1 dekret na jedno volební právo v Landsraadu)"})
+      .afterClosed()
+      .subscribe(
+        result => {
+          if (result) {
+            // delete old questions and answers
+            this.db.list("landsraad/questions", ref => ref.orderByChild("roundId").equalTo(this.roundId)).snapshotChanges().pipe(
+              take(1),
+              map(
+                snapshots => {
+                  snapshots.forEach(
+                    snapshot => {
+                      this.db.object(`landsraad/questions/${snapshot.key}`).remove()
+                      this.db.object(`landsraad/answers/${snapshot.key}`).remove()
+                    }
+                  )
+                }
+              )
+            ).subscribe()
+            // create new questions and answers for each votingRight
+            this.db.list("landsraad/votingRights").valueChanges().pipe(
+              take(1),
+              map(
+                votingRights => {
+                  votingRights.forEach(
+                    votingRight => {
+                      let delegateId = votingRight["controlledBy"]
+                      let ref = this.db.list("landsraad/questions/").push({
+                        questionType: "",
+                        name: "",
+                        byDelegateId: delegateId,
+                        byVotingRight: votingRight["name"],
+                        roundId: this.roundId,
+                        hidden: false
+                      })
+                      const answers = ["ANO", "NE"]
+                      answers.forEach(
+                        answer => {
+                          this.db.list(`landsraad/answers/${ref.key}`).push({name: answer.trim()})
+                        }
+                      )
+                      this.db.object(`delegateRounds/${delegateId}/${this.roundId}/markedQuestionAsSent`).set(false)
+                    }
+                  )
+                }
+              )
+            ).subscribe()
+          }
+        }
+      )
   }
 
   deleteRound() {
