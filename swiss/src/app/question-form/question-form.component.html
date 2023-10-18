@@ -1,13 +1,30 @@
-<form [formGroup]="questionForm" appFireForm [path]="path" (stateChange)="changeHandler($event)">
+<form [formGroup]="questionForm" class="question-form" appFireForm [path]="path" (stateChange)="changeHandler($event)">
+    <mat-form-field class="text">
+        <input matInput placeholder="Typ dekretu" type="text" formControlName="decretType" />
+    </mat-form-field>&nbsp;
     <mat-form-field class="text">
         <input matInput placeholder="Otázka" type="text" formControlName="name" />
     </mat-form-field>&nbsp;
+    <mat-form-field class="text">
+        <input matInput placeholder="Navrženo delegátem" type="text" formControlName="byDelegateId" readonly />
+    </mat-form-field>&nbsp;
+    <mat-form-field class="text">
+        <input matInput placeholder="Navrženo rodem" type="text" formControlName="byHouse" readonly />
+    </mat-form-field>&nbsp;
+    <mat-form-field class="text">
+        <input matInput placeholder="Navrženo v kole" type="text" formControlName="roundId" readonly />
+    </mat-form-field>&nbsp;
     <app-answer-form *ngFor="let path of answerPaths | async" [path]="path"></app-answer-form>
-     {{ state }} &nbsp;
-    <button mat-stroked-button color="accent" (click)="export()">
-        Export hlasů
-    </button>&nbsp;
-    <button mat-stroked-button color="accent" (click)="delete()">
-        Smazat
-    </button>
+    <div class="question-form-buttons">
+        {{ state }}&nbsp;
+        <mat-checkbox class="basic-checkbox" formControlName="hidden">
+            Otázka schovaná
+        </mat-checkbox>&nbsp;
+        <button mat-stroked-button color="accent" (click)="delete()">
+            Smazat
+        </button>&nbsp;
+        <button mat-stroked-button color="basic" (click)="export()">
+            Export hlasů
+        </button>
+    </div>
 </form>

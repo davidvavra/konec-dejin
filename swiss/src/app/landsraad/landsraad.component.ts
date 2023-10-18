@@ -1,9 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
+<<<<<<< HEAD
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
 import { ValueName, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
+=======
+import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
+import { combineLatest } from 'rxjs';
+import { Observable } from 'rxjs';
+import { flatMap, map } from 'rxjs/operators';
+import { ValueName, ValueNameExtended } from '../../../../common/config';
+>>>>>>> 3866cd5 (Landsraad UI improvements)
 
 @Component({
   selector: 'app-landsraad',
@@ -20,10 +28,22 @@ export class LandsraadComponent implements OnInit {
   alreadyVotedCount: Observable<number>
   maxVotedCount: Observable<number>
   resultsShown: Observable<boolean>
+  rounds: Observable<ValueName[]>
+  filteredRoundSelected: string = ""
+  path: string = "landsraad/questionsConfig"
+  questionsConfig: FormGroup
+  showHiddenQuestions: Observable<boolean>
+  filterByRoundId: Observable<string>
 
-  constructor(public db: AngularFireDatabase) { }
+  constructor(private fb: FormBuilder, public db: AngularFireDatabase) { }
 
   ngOnInit() {
+    this.showHiddenQuestions = this.db.object("landsraad/questionsConfig/showHiddenQuestions").valueChanges() as Observable<boolean>
+    this.filterByRoundId = this.db.object("landsraad/questionsConfig/filterByRound").valueChanges() as Observable<string>
+    this.questionsConfig = this.fb.group({
+      showHiddenQuestions: [true],
+      filterByRound: [""]
+    })
     this.delegates = this.db.list("delegates").snapshotChanges().pipe(
       map(
         snapshots => {
@@ -38,6 +58,7 @@ export class LandsraadComponent implements OnInit {
           return snapshots.map(snapshot => "landsraad/votingRights/" + snapshot.key)
         })
     )
+<<<<<<< HEAD
     this.questionPaths = this.db.list("landsraad/questions").snapshotChanges().pipe(
       map(
         snapshots => {
@@ -47,8 +68,22 @@ export class LandsraadComponent implements OnInit {
             return question["questionType"] !== ""
           })
           return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
+=======
+    this.questionPaths = combineLatest(
+      this.db.list("landsraad/questions").snapshotChanges(),
+      this.showHiddenQuestions,
+      this.filterByRoundId,
+      (questionsSnapshots, showHiddenQuestions, filterByRoundId) => {
+        let snapshotsFiltered = questionsSnapshots
+        .filter(snapshot => {
+          let question = snapshot.payload.val() as ValueNameExtended
+          return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
+>>>>>>> 3866cd5 (Landsraad UI improvements)
         })
+        return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
+      }      
     )
+<<<<<<< HEAD
     this.questions = this.db.list("landsraad/questions").snapshotChanges().pipe(
       map(
         snapshots => {
@@ -57,7 +92,38 @@ export class LandsraadComponent implements OnInit {
           .map(snapshot => {
             return { value: snapshot.key, name: snapshot.payload.val()["name"] }
           }).concat({ value: "", name: "- Žádná -" })
+=======
+
+    this.questions = combineLatest(
+      this.db.list("landsraad/questions").snapshotChanges(),
+      this.showHiddenQuestions,
+      this.filterByRoundId,
+      (questionsSnapshots, showHiddenQuestions, filterByRoundId) => {
+        let questions: ValueNameExtended[] = questionsSnapshots
+        .map(snapshot => {
+          let question = snapshot.payload.val()
+          return {
+            value: snapshot.key, 
+            name: question["name"],
+            roundId: question["roundId"],
+            hidden: question["hidden"],
+            decretType: question["decretType"]
+          }
+>>>>>>> 3866cd5 (Landsraad UI improvements)
         })
+        let filteredQuestions: ValueNameExtended[] = questions
+        .filter(question => {
+          return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
+        })
+        return filteredQuestions
+        .map(question => {
+          return {
+            value: question["value"],
+            name: question["name"]
+          }
+        })
+        .concat({ value: "", name: "- Žádná -" })
+      }
     )
     this.currentQuestion = this.db.object("landsraad/currentQuestion").valueChanges() as Observable<string>
     this.alreadyVotedCount = (this.db.object("landsraad/currentQuestion").valueChanges() as Observable<string>).pipe(flatMap((currentQuestionId, _) => {
@@ -67,6 +133,22 @@ export class LandsraadComponent implements OnInit {
     }))
     this.maxVotedCount = this.votingRightPaths.pipe(map(items => items.length))
     this.resultsShown = this.db.object("landsraad/votingConfig/resultsShown").valueChanges() as Observable<boolean>
+    this.rounds = this.db.list("rounds").snapshotChanges().pipe(
+      map(
+        roundsSnapshots => {
+          let formattedRounds = roundsSnapshots.map(roundRef => {
+            let round = roundRef.payload.val()
+            let key = roundRef.key
+            return {
+              value: key,
+              name: round["name"]
+            }
+          })
+          formattedRounds.push({ value: "", name: "- Žádné -" })
+          return formattedRounds
+        }
+      )
+    )
   }
 
   addVotingRight(form: NgForm) {
@@ -102,5 +184,11 @@ export class LandsraadComponent implements OnInit {
   toggleVotingCheckbox(event) {
     this.resultsShown = event.checked
     this.db.object("landsraad/votingConfig/resultsShown").set(event.checked)
+  }
+
+  questionEligibleToDisplay(question: ValueNameExtended, showHiddenQuestions: boolean, filterByRoundId: string) {
+    return question["decretType"] !== "- Žádný -"
+      && (showHiddenQuestions || !showHiddenQuestions && !question.hidden) 
+      && (filterByRoundId === "" || filterByRoundId !== "" && (!question.roundId || question.roundId === filterByRoundId))
   }
 }

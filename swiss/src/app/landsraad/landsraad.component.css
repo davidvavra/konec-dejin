@@ -9,7 +9,18 @@
     width: 630px;
 }
 
+.filter-by-round {
+    width: 350px;
+}
+
 .basic-checkbox {
     padding: 1.25em;
     padding-left: 2.5em;
 }
+
+.mat-card {
+    button.mat-basic {
+        color: #8c5b08 !important;
+    }
+}
+
