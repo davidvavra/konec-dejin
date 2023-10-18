@@ -114,6 +114,12 @@ export interface ValueName {
     name: string;
 }
 
+export interface ValueNameExtended extends ValueName {
+    roundId: string;
+    hidden: boolean;
+    decretType: string;
+}
+
 export function findValueName(rows: ValueName[], value: string) {
     if (value == undefined) return "N/A"
     let row = rows.find((row) => row.value == value)

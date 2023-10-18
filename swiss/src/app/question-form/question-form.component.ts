@@ -6,6 +6,7 @@ import { ngxCsv } from 'ngx-csv';
 import { combineLatest, Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { DeleteConfirmDialogComponent } from '../delete-confirm-dialog/delete-confirm-dialog.component';
+import { ValueName } from '../../../../common/config';
 
 @Component({
   selector: 'app-question-form',
@@ -17,19 +18,32 @@ export class QuestionFormComponent implements OnInit {
   constructor(private fb: FormBuilder, private db: AngularFireDatabase, private dialog: MatDialog) { }
 
   questionForm: FormGroup;
-
   state: string;
-
   questionId: string;
 
   @Input()
   path: string
 
+  @Input()
+  delegates: Observable<ValueName[]>
+
+  @Input()
+  rounds: Observable<ValueName[]>
+
   answerPaths: Observable<string[]>
 
   ngOnInit() {
+    // TODO delegateId and roundId to names
+    console.log("question form delegates")
+    this.delegates.pipe(map(delegates => delegates.forEach(delegate => console.log(delegate)))).subscribe()
+    console.log("question form rounds", this.rounds)
     this.questionForm = this.fb.group({
-      name: ['']
+      name: [''],
+      decretType: [""],
+      byHouse: [""],
+      byDelegateId: [""],
+      roundId: [""],
+      hidden: [false],
     })
     let paths = this.path.split("/")
     this.questionId = paths[2]
