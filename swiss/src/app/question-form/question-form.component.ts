@@ -33,14 +33,16 @@ export class QuestionFormComponent implements OnInit {
   answerPaths: Observable<string[]>
 
   ngOnInit() {
-    // TODO delegateId and roundId to names
+    // TODO delegateId, roundId and votingRightId to names
+    // TODO maybe already can be filtered in the parent component and the names just passed
+    // I should not use fireform for it but just display as text => even more calls for input value
     console.log("question form delegates")
     this.delegates.pipe(map(delegates => delegates.forEach(delegate => console.log(delegate)))).subscribe()
     console.log("question form rounds", this.rounds)
     this.questionForm = this.fb.group({
       name: [''],
       decretType: [""],
-      byHouse: [""],
+      byVotingRightId: [""],
       byDelegateId: [""],
       roundId: [""],
       hidden: [false],
