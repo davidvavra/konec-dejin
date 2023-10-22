@@ -1,17 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
-<<<<<<< HEAD
-import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { flatMap, map } from 'rxjs/operators';
-import { ValueName, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
-=======
 import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
-import { combineLatest } from 'rxjs';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
-import { ValueName, ValueNameExtended } from '../../../../common/config';
->>>>>>> 3866cd5 (Landsraad UI improvements)
+import { ValueName, ValueNameExtended, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-landsraad',
@@ -58,17 +50,6 @@ export class LandsraadComponent implements OnInit {
           return snapshots.map(snapshot => "landsraad/votingRights/" + snapshot.key)
         })
     )
-<<<<<<< HEAD
-    this.questionPaths = this.db.list("landsraad/questions").snapshotChanges().pipe(
-      map(
-        snapshots => {
-          let snapshotsFiltered = snapshots.filter(snap => {
-            const question = snap.payload.val()
-            // as we now have to fill-in DB object even if no question is selected, filter out "no selected" question
-            return question["questionType"] !== ""
-          })
-          return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
-=======
     this.questionPaths = combineLatest(
       this.db.list("landsraad/questions").snapshotChanges(),
       this.showHiddenQuestions,
@@ -78,22 +59,10 @@ export class LandsraadComponent implements OnInit {
         .filter(snapshot => {
           let question = snapshot.payload.val() as ValueNameExtended
           return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
->>>>>>> 3866cd5 (Landsraad UI improvements)
         })
         return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
       }      
     )
-<<<<<<< HEAD
-    this.questions = this.db.list("landsraad/questions").snapshotChanges().pipe(
-      map(
-        snapshots => {
-          return snapshots
-          .filter(snapshot => snapshot.payload.val()["questionType"] !== "")
-          .map(snapshot => {
-            return { value: snapshot.key, name: snapshot.payload.val()["name"] }
-          }).concat({ value: "", name: "- Žádná -" })
-=======
-
     this.questions = combineLatest(
       this.db.list("landsraad/questions").snapshotChanges(),
       this.showHiddenQuestions,
@@ -109,7 +78,6 @@ export class LandsraadComponent implements OnInit {
             hidden: question["hidden"],
             decretType: question["decretType"]
           }
->>>>>>> 3866cd5 (Landsraad UI improvements)
         })
         let filteredQuestions: ValueNameExtended[] = questions
         .filter(question => {
@@ -187,7 +155,7 @@ export class LandsraadComponent implements OnInit {
   }
 
   questionEligibleToDisplay(question: ValueNameExtended, showHiddenQuestions: boolean, filterByRoundId: string) {
-    return question["decretType"] !== "- Žádný -"
+    return question["decretType"] !== ""
       && (showHiddenQuestions || !showHiddenQuestions && !question.hidden) 
       && (filterByRoundId === "" || filterByRoundId !== "" && (!question.roundId || question.roundId === filterByRoundId))
   }
