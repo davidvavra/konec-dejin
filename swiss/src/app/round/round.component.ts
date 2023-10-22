@@ -372,7 +372,7 @@ export class RoundComponent implements OnInit {
                           this.db.list(`landsraad/answers/${ref.key}`).push({name: answer.trim()})
                         }
                       )
-                      this.db.object(`delegateRounds/${delegateId}/${this.roundId}/markedQuestionAsSent`).set(false)
+                      this.db.object(`delegateRounds/${delegateId}/${this.roundId}/markedLandsraadQuestionsAsSent`).set(false)
                     }
                   )
                 }

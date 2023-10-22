@@ -93,6 +93,8 @@ export const ALL_QUESTIONS: ValueName[] = [
     { value: "", name: "- Žádný -" }
 ]
 
+export const QUESTION_TYPE_HLAS_LANDSRAADU: ValueName = { value: "hlas_landsradu", name: "Hlas Landsraadu" }
+
 export interface ValueName {
     value: string;
     name: string;

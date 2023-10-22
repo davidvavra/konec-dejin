@@ -70,14 +70,14 @@
       "round_1": {
         "delegation": "delegation_id_1",
         "markedAsSent": true,
-        "markedQuestionAsSent": true,
+        "markedLandsraadQuestionsAsSent": true,
         "bv": 30,
         "message": "You are doomed"
       },
       "round_2": {
         "delegation": "delegation_id_1",
         "markedAsSent": true,
-        "markedQuestionAsSent": false
+        "markedLandsraadQuestionsAsSent": false
       }
     }
   },

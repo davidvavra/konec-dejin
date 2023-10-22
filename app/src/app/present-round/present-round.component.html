@@ -12,7 +12,7 @@ potřebujete více času, napište na Slacku.)</p>
 <br />
 <app-decret-form *ngFor="let votingRight of controlledVotingRights | async" [votingRight]="votingRight" [roundId]="roundId" [delegateId]="delegateId"></app-decret-form>
 <br />
-<button mat-raised-button color="accent" *ngIf="!(markedQuestionAsSent | async) else questionSent" (click)="sendQuestion()">Odeslat návrh dekretů</button>
+<button mat-raised-button color="accent" *ngIf="!(markedLandsraadQuestionsAsSent | async) else questionSent" (click)="sendQuestion()">Odeslat návrh dekretů</button>
 <ng-template #questionSent>
   <p><strong>Návrh dekretů odeslán</strong></p>
 </ng-template>

@@ -61,7 +61,7 @@ path /delegateRounds {
     write() { isSameDelegate(delegate_id) }
   }
 
-  path /{delegate_id}/{round_id}/markedQuestionAsSent is Boolean {
+  path /{delegate_id}/{round_id}/markedLandsraadQuestionsAsSent is Boolean {
     write() { isSameDelegate(delegate_id) }
   }
 }
@@ -141,7 +141,20 @@ path /landsraad/votingRights {
 
 path /landsraad/questions {
   read() { isSignedIn() }
-  write() { isSignedIn() }
+  write() { isSwiss() }
+  path /{question_id} is Question {
+    read() { isSignedIn() }
+    write() { isSwiss() || (query.orderByChild == "byDelegateId" && query.equalTo == auth.uid) }
+  }
+}
+
+type Question {
+  name: Description | Null,
+  questionType: Keyword | Null,
+  byDelegateId: Id | Null,
+  byVotingRight: Keyword | Null,
+  roundId: Id | Null,
+  hidden: Boolean,
 }
 
 path /landsraad/answers {

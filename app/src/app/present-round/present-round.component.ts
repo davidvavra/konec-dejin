@@ -21,7 +21,7 @@ export class PresentRoundComponent implements OnInit {
 
   primaryActionPaths: Observable<string[]>
   markedAsSent: Observable<boolean>
-  markedQuestionAsSent: Observable<boolean>
+  markedLandsraadQuestionsAsSent: Observable<boolean>
   controlledVotingRights: Observable<VotingRightWithQuestionPath[]>
   delegateId: string
   delegationId: string
@@ -47,7 +47,7 @@ export class PresentRoundComponent implements OnInit {
         return val as boolean
       })
     )
-    this.markedQuestionAsSent = this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedQuestionAsSent").valueChanges().pipe(
+    this.markedLandsraadQuestionsAsSent = this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedLandsraadQuestionsAsSent").valueChanges().pipe(
       map(val => {
         return val as boolean
       })
@@ -88,6 +88,6 @@ export class PresentRoundComponent implements OnInit {
   }
 
   sendQuestion() {
-    this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedQuestionAsSent").set(true)
+    this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedLandsraadQuestionsAsSent").set(true)
   }
 }

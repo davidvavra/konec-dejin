@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { flatMap, map, take, tap } from 'rxjs/operators';
-import { ValueName } from '../../../../common/config';
+import { flatMap, map } from 'rxjs/operators';
+import { ValueName, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-landsraad',
@@ -82,7 +82,7 @@ export class LandsraadComponent implements OnInit {
   addQuestion(form: NgForm) {
     if (form.valid) {
       let ref = this.db.list("landsraad/questions").push({
-        questionType: "Hlas Landsraadu",
+        questionType: QUESTION_TYPE_HLAS_LANDSRAADU["value"],
         name: form.value["name"]
       });
       (form.value["answers"] as string).split(",").forEach(
