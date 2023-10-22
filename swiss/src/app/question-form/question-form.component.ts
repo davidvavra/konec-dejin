@@ -33,15 +33,16 @@ export class QuestionFormComponent implements OnInit {
   answerPaths: Observable<string[]>
 
   ngOnInit() {
+    this.db.object(this.path).valueChanges().pipe().subscribe(question => console.log("question", question))
     // TODO delegateId, roundId and votingRightId to names
     // TODO maybe already can be filtered in the parent component and the names just passed
     // I should not use fireform for it but just display as text => even more calls for input value
-    console.log("question form delegates")
-    this.delegates.pipe(map(delegates => delegates.forEach(delegate => console.log(delegate)))).subscribe()
-    console.log("question form rounds", this.rounds)
+    // format "Dekret type" and also show as text (no connection to fireform)
+    // only name will be editable
+    // TODO format width of the name so it is wider and questions are properly visible.
     this.questionForm = this.fb.group({
       name: [''],
-      decretType: [""],
+      questionType: [""],
       byVotingRightId: [""],
       byDelegateId: [""],
       roundId: [""],
@@ -65,6 +66,7 @@ export class QuestionFormComponent implements OnInit {
     this.dialog.open(DeleteConfirmDialogComponent, { data: this.questionForm.controls.name.value }).afterClosed().subscribe(
       result => {
         if (result) {
+          // TODO landsraad/votes warning permission errors: this worked: ".write": "auth.uid == 'swiss'",
           this.db.object("landsraad/answers/"+this.questionId).remove();
           this.db.object("landsraad/votes/"+this.questionId).remove();
           this.db.object(this.path).remove()

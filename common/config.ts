@@ -103,7 +103,7 @@ export interface ValueName {
 export interface ValueNameExtended extends ValueName {
     roundId: string;
     hidden: boolean;
-    decretType: string;
+    questionType: string;
 }
 
 export function findValueName(rows: ValueName[], value: string) {

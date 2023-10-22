@@ -76,7 +76,7 @@ export class LandsraadComponent implements OnInit {
             name: question["name"],
             roundId: question["roundId"],
             hidden: question["hidden"],
-            decretType: question["decretType"]
+            questionType: question["questionType"]
           }
         })
         let filteredQuestions: ValueNameExtended[] = questions
@@ -132,8 +132,12 @@ export class LandsraadComponent implements OnInit {
   addQuestion(form: NgForm) {
     if (form.valid) {
       let ref = this.db.list("landsraad/questions").push({
+        name: form.value["name"],
         questionType: QUESTION_TYPE_HLAS_LANDSRAADU["value"],
-        name: form.value["name"]
+        byVotingRightId: "",
+        byDelegateId: "",
+        roundId: "",
+        hidden: false
       });
       (form.value["answers"] as string).split(",").forEach(
         answer => {
@@ -143,6 +147,7 @@ export class LandsraadComponent implements OnInit {
         }
       )
     }
+    // TODO clear out the form for new question
   }
 
   currentQuestionChanged(event) {
@@ -155,8 +160,11 @@ export class LandsraadComponent implements OnInit {
   }
 
   questionEligibleToDisplay(question: ValueNameExtended, showHiddenQuestions: boolean, filterByRoundId: string) {
-    return question["decretType"] !== ""
+    // questionType available
+    return !!question["questionType"]
+    // shown / hidden condition
       && (showHiddenQuestions || !showHiddenQuestions && !question.hidden) 
+    // roundId filtering condition
       && (filterByRoundId === "" || filterByRoundId !== "" && (!question.roundId || question.roundId === filterByRoundId))
   }
 }
