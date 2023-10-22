@@ -53,9 +53,9 @@ export class PresentRoundComponent implements OnInit {
       })
     )
     this.controlledVotingRights = combineLatest(
-      this.db.list("landsraad/votingRights", ref => ref.orderByChild("controlledBy").equalTo(this.delegateId)).valueChanges(),
+      this.db.list("landsraad/votingRights", ref => ref.orderByChild("controlledBy").equalTo(this.delegateId)).snapshotChanges(),
       this.db.list("landsraad/questions/", ref => ref.orderByChild("byDelegateId").equalTo(this.delegateId)).snapshotChanges(),
-      (votingRights, questionsSnapshots) => {
+      (votingRightsSnapshots, questionsSnapshots) => {
         let questions: QuestionWithDbPath[] = questionsSnapshots.map(
           snapshot => {
           let question = snapshot.payload.val() as Question
@@ -64,11 +64,12 @@ export class PresentRoundComponent implements OnInit {
             dbPath: `landsraad/questions/${snapshot.key}`
           }
         })
-        let votingRightsPath: VotingRightWithQuestionPath[] = votingRights.map(
-          (votingRight: VotingRight) => {
+        let votingRightsPath: VotingRightWithQuestionPath[] = votingRightsSnapshots.map(
+          (votingRightSnapshot) => {
+            let votingRight = votingRightSnapshot.payload.val() as VotingRight
             let questionForVotingRight = questions.find(
               question => {
-                return question["byVotingRight"] === votingRight["name"] && question["roundId"] === this.roundId
+                return question["byVotingRightId"] === votingRightSnapshot.key && question["roundId"] === this.roundId
               })
             if (questionForVotingRight) {
               return {

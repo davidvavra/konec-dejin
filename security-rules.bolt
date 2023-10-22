@@ -152,7 +152,7 @@ type Question {
   name: Description | Null,
   questionType: Keyword | Null,
   byDelegateId: Id | Null,
-  byVotingRight: Keyword | Null,
+  byVotingRightId: Id | Null,
   roundId: Id | Null,
   hidden: Boolean,
 }

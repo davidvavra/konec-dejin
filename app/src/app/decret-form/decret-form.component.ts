@@ -37,7 +37,7 @@ export class DecretFormComponent implements OnInit {
       questionType: [""],
       name: [""],
       byDelegateId: [this.delegateId],
-      byVotingRight: [""],
+      byVotingRightId: [""],
       roundId: [this.roundId],
       hidden: [false]
     })

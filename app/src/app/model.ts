@@ -67,7 +67,7 @@ export interface Question {
     name: string,
     questionType: string,
     byDelegateId: string,
-    byVotingRight: string,
+    byVotingRightId: string,
     roundId: string,
     hidden: boolean,
 }

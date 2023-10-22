@@ -351,18 +351,19 @@ export class RoundComponent implements OnInit {
               )
             ).subscribe()
             // create new questions and answers for each votingRight
-            this.db.list("landsraad/votingRights").valueChanges().pipe(
+            this.db.list("landsraad/votingRights").snapshotChanges().pipe(
               take(1),
               map(
-                votingRights => {
-                  votingRights.forEach(
-                    votingRight => {
+                votingRightsSnapshots => {
+                  votingRightsSnapshots.forEach(
+                    votingRightSnapshot => {
+                      let votingRight = votingRightSnapshot.payload.val()
                       let delegateId = votingRight["controlledBy"]
                       let ref = this.db.list("landsraad/questions/").push({
                         questionType: "",
                         name: "",
                         byDelegateId: delegateId,
-                        byVotingRight: votingRight["name"],
+                        byVotingRightId: votingRightSnapshot.key,
                         roundId: this.roundId,
                         hidden: false
                       })
