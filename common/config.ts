@@ -78,6 +78,23 @@ export const UNIT_VISIBILITIES: ValueName[] = [
     { value: 'fremen', name: "Fremenská" }
 ]
 
+export const ALL_QUESTIONS: ValueName[] = [
+    { value: "mandat_sardaukaru", name: "Mandát sardaukarů" },
+    { value: "zruseni_mandatu_sardaukaru", name: "Zrušení mandátu sardaukarů" },
+    { value: "vyslani_vojsk_landsraadu", name: "Vyslání vojsk Landsraadu" },
+    { value: "zmena_mandatu_vojsk_landsraadu", name: "Změna mandátu vojsk Landsraadu" },
+    { value: "stazeni_vojska_landsraadu", name: "Stažení vojsk Landsraadu" },
+    { value: "zrizeni_vysetrovaci_komise", name: "Zřízení vyšetřovací komise" },
+    { value: "prerozdeleni_podilu_choam", name: "Přerozdělení podílů CHOAM" },
+    { value: "uvaleni_embarga", name: "Uvalení embarga" },
+    { value: "zruseni_embarga", name: "Zrušení embarga" },
+    { value: "zmena_kvot", name: "Změna kvót" },
+    { value: "jiny", name: "Jiný" },
+    { value: "", name: "- Žádný -" }
+]
+
+export const QUESTION_TYPE_HLAS_LANDSRAADU: ValueName = { value: "hlas_landsradu", name: "Hlas Landsraadu" }
+
 export interface ValueName {
     value: string;
     name: string;

@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAction, AngularFireDatabase, DatabaseSnapshot } from '@angular/fire/database';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { NgForm } from '@angular/forms';
-import { ngxCsv } from 'ngx-csv';
-import { combineLatest } from 'rxjs';
 import { Observable } from 'rxjs';
-import { flatMap, map, take, tap } from 'rxjs/operators';
-import { ValueName } from '../../../../common/config';
+import { flatMap, map } from 'rxjs/operators';
+import { ValueName, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-landsraad',
@@ -43,13 +41,20 @@ export class LandsraadComponent implements OnInit {
     this.questionPaths = this.db.list("landsraad/questions").snapshotChanges().pipe(
       map(
         snapshots => {
-          return snapshots.map(snapshot => "landsraad/questions/" + snapshot.key)
+          let snapshotsFiltered = snapshots.filter(snap => {
+            const question = snap.payload.val()
+            // as we now have to fill-in DB object even if no question is selected, filter out "no selected" question
+            return question["questionType"] !== ""
+          })
+          return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
         })
     )
     this.questions = this.db.list("landsraad/questions").snapshotChanges().pipe(
       map(
         snapshots => {
-          return snapshots.map(snapshot => {
+          return snapshots
+          .filter(snapshot => snapshot.payload.val()["questionType"] !== "")
+          .map(snapshot => {
             return { value: snapshot.key, name: snapshot.payload.val()["name"] }
           }).concat({ value: "", name: "- Žádná -" })
         })
@@ -77,6 +82,7 @@ export class LandsraadComponent implements OnInit {
   addQuestion(form: NgForm) {
     if (form.valid) {
       let ref = this.db.list("landsraad/questions").push({
+        questionType: QUESTION_TYPE_HLAS_LANDSRAADU["value"],
         name: form.value["name"]
       });
       (form.value["answers"] as string).split(",").forEach(

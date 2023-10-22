@@ -70,12 +70,14 @@
       "round_1": {
         "delegation": "delegation_id_1",
         "markedAsSent": true,
+        "markedLandsraadQuestionsAsSent": true,
         "bv": 30,
         "message": "You are doomed"
       },
       "round_2": {
         "delegation": "delegation_id_1",
-        "markedAsSent": true
+        "markedAsSent": true,
+        "markedLandsraadQuestionsAsSent": false
       }
     }
   },
@@ -138,8 +140,17 @@
     },
     "questions": {
       "question_id_1": {
-        "name": "Deploy Sardaukarů?"
+        "name": "Deploy Sardaukarů?",
+        "questionType": "mandat_sardaukaru",
+        "byDelegateId": "delegate_id_1",
+        "byVotingRightId": "Harko",
+        "roundId": "round_id_1",
+        "hidden": false
       }
+    },
+    "questionsConfig": {
+      "filterByRound": "",
+      "showHiddenQuestions": true
     },
     "answers": {
       "question_id_1": {

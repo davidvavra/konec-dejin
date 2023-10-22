@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Action } from '../model';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { VotingRight, VotingRightWithQuestionPath, Question, QuestionWithDbPath } from '../model';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { map, flatMap, tap } from 'rxjs/operators';
@@ -21,6 +21,8 @@ export class PresentRoundComponent implements OnInit {
 
   primaryActionPaths: Observable<string[]>
   markedAsSent: Observable<boolean>
+  markedLandsraadQuestionsAsSent: Observable<boolean>
+  controlledVotingRights: Observable<VotingRightWithQuestionPath[]>
   delegateId: string
   delegationId: string
   spentDf = new BehaviorSubject<number>(0)
@@ -45,9 +47,48 @@ export class PresentRoundComponent implements OnInit {
         return val as boolean
       })
     )
+    this.markedLandsraadQuestionsAsSent = this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedLandsraadQuestionsAsSent").valueChanges().pipe(
+      map(val => {
+        return val as boolean
+      })
+    )
+    this.controlledVotingRights = combineLatest(
+      this.db.list("landsraad/votingRights", ref => ref.orderByChild("controlledBy").equalTo(this.delegateId)).snapshotChanges(),
+      this.db.list("landsraad/questions/", ref => ref.orderByChild("byDelegateId").equalTo(this.delegateId)).snapshotChanges(),
+      (votingRightsSnapshots, questionsSnapshots) => {
+        let questions: QuestionWithDbPath[] = questionsSnapshots.map(
+          snapshot => {
+          let question = snapshot.payload.val() as Question
+          return {
+            ...question,
+            dbPath: `landsraad/questions/${snapshot.key}`
+          }
+        })
+        let votingRightsPath: VotingRightWithQuestionPath[] = votingRightsSnapshots.map(
+          (votingRightSnapshot) => {
+            let votingRight = votingRightSnapshot.payload.val() as VotingRight
+            let questionForVotingRight = questions.find(
+              question => {
+                return question["byVotingRightId"] === votingRightSnapshot.key && question["roundId"] === this.roundId
+              })
+            if (questionForVotingRight) {
+              return {
+                ...votingRight,
+                dbPath: questionForVotingRight.dbPath
+              }
+            }
+          }
+        )
+        return votingRightsPath
+      }
+    )
   }
 
   send() {
     this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedAsSent").set(true)
+  }
+
+  sendQuestion() {
+    this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/markedLandsraadQuestionsAsSent").set(true)
   }
 }
