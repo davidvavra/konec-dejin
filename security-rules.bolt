@@ -144,7 +144,7 @@ path /landsraad/questions {
   write() { isSwiss() }
   path /{question_id} is Question {
     read() { isSignedIn() }
-    write() { isSwiss() || (query.orderByChild == "byDelegateId" && query.equalTo == auth.uid) }
+    write() { isSameDelegate(this.byDelegateId) }
   }
 }
 
