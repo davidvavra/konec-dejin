@@ -45,7 +45,7 @@ export class QuestionFormComponent implements OnInit {
     ALL_QUESTIONS.push(QUESTION_TYPE_HLAS_LANDSRAADU)
     this.db.object(this.path).valueChanges().pipe().subscribe(question => console.log("question", question))
     this.questionForm = this.fb.group({
-      name: [''],
+      name: ['']
     })
     let paths = this.path.split("/")
     this.questionId = paths[2]
