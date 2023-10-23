@@ -45,11 +45,11 @@
     <p>Přidat otázku:</p>
     <mat-card class="card">
         <form (ngSubmit)="addQuestion(addQuestionForm)" #addQuestionForm="ngForm">
-            <mat-form-field class="text">
+            <mat-form-field class="input-question">
                 <input matInput placeholder="Otázka" type="text" name="name" required ngModel>
             </mat-form-field>
             <br />
-            <mat-form-field class="text">
+            <mat-form-field class="input-answers">
                 <input matInput placeholder="Odpovědi oddělené čárkou" type="text" name="answers" required ngModel>
             </mat-form-field>
             <br />

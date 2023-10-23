@@ -164,7 +164,6 @@ export class LandsraadComponent implements OnInit {
         }
       )
     }
-    // TODO clear out the form for new question
   }
 
   currentQuestionChanged(event) {

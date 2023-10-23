@@ -43,7 +43,6 @@ export class QuestionFormComponent implements OnInit {
 
   ngOnInit() {
     ALL_QUESTIONS.push(QUESTION_TYPE_HLAS_LANDSRAADU)
-    this.db.object(this.path).valueChanges().pipe().subscribe(question => console.log("question", question))
     this.questionForm = this.fb.group({
       name: ['']
     })
@@ -65,10 +64,7 @@ export class QuestionFormComponent implements OnInit {
             this.delegateName = delegate && delegate["name"]
           })
           this.votingRights.pipe().subscribe(rights => {
-            console.log("rights", rights)
-            console.log(question["byVotingRightId"])
             let right = rights.find(right => right["value"] === question["byVotingRightId"])
-            console.log("right", right)
             this.votingRightName = right && right["name"]
           })
           this.rounds.pipe().subscribe(rounds => {
