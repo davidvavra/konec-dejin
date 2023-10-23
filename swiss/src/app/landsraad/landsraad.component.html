@@ -40,7 +40,7 @@
     </mat-card>
     <p>Otázky:</p>
     <mat-card class="card">
-        <app-question-form *ngFor="let path of questionPaths | async" [path]="path" [delegates]="delegates" [rounds]="rounds"></app-question-form>
+        <app-question-form *ngFor="let path of questionPaths | async" [path]="path" [delegates]="delegates" [votingRights]="votingRights" [rounds]="rounds"></app-question-form>
     </mat-card>
     <p>Přidat otázku:</p>
     <mat-card class="card">

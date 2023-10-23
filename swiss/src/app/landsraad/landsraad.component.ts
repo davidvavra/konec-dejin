@@ -26,6 +26,7 @@ export class LandsraadComponent implements OnInit {
   questionsConfig: FormGroup
   showHiddenQuestions: Observable<boolean>
   filterByRoundId: Observable<string>
+  votingRights: Observable<ValueName[]>
 
   constructor(private fb: FormBuilder, public db: AngularFireDatabase) { }
 
@@ -114,6 +115,22 @@ export class LandsraadComponent implements OnInit {
           })
           formattedRounds.push({ value: "", name: "- Žádné -" })
           return formattedRounds
+        }
+      )
+    )
+    this.votingRights = this.db.list("landsraad/votingRights").snapshotChanges().pipe(
+      map(
+        rightsSnapshots => {
+          let formattedRights = rightsSnapshots.map(rightRef => {
+            let right = rightRef.payload.val()
+            let key = rightRef.key
+            return {
+              value: key,
+              name: right["name"]
+            }
+          })
+          formattedRights.push({ value: "", name: "- Žádný -" })
+          return formattedRights
         }
       )
     )

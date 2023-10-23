@@ -7,6 +7,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { DeleteConfirmDialogComponent } from '../delete-confirm-dialog/delete-confirm-dialog.component';
 import { ValueName } from '../../../../common/config';
+import { ALL_QUESTIONS, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-question-form',
@@ -30,23 +31,21 @@ export class QuestionFormComponent implements OnInit {
   @Input()
   rounds: Observable<ValueName[]>
 
+  @Input()
+  votingRights: Observable<ValueName[]>
+
+  delegateName: string
+  roundName: string
+  votingRightName: string
+  questionTypeFormatted: string
+
   answerPaths: Observable<string[]>
 
   ngOnInit() {
+    ALL_QUESTIONS.push(QUESTION_TYPE_HLAS_LANDSRAADU)
     this.db.object(this.path).valueChanges().pipe().subscribe(question => console.log("question", question))
-    // TODO delegateId, roundId and votingRightId to names
-    // TODO maybe already can be filtered in the parent component and the names just passed
-    // I should not use fireform for it but just display as text => even more calls for input value
-    // format "Dekret type" and also show as text (no connection to fireform)
-    // only name will be editable
-    // TODO format width of the name so it is wider and questions are properly visible.
     this.questionForm = this.fb.group({
       name: [''],
-      questionType: [""],
-      byVotingRightId: [""],
-      byDelegateId: [""],
-      roundId: [""],
-      hidden: [false],
     })
     let paths = this.path.split("/")
     this.questionId = paths[2]
@@ -56,6 +55,30 @@ export class QuestionFormComponent implements OnInit {
           return snapshots.map(snapshot => "landsraad/answers/" + this.questionId + "/" + snapshot.key)
         })
     )
+    this.db.object(this.path).valueChanges().pipe(
+      tap(
+        question => {
+          let questionDef = ALL_QUESTIONS.find(q => q["value"] === question["questionType"])
+          this.questionTypeFormatted = questionDef && questionDef["name"]
+          this.delegates.pipe().subscribe(delegates => {
+            let delegate = delegates.find(delegate => delegate["value"] === question["byDelegateId"])
+            this.delegateName = delegate && delegate["name"]
+          })
+          this.votingRights.pipe().subscribe(rights => {
+            console.log("rights", rights)
+            console.log(question["byVotingRightId"])
+            let right = rights.find(right => right["value"] === question["byVotingRightId"])
+            console.log("right", right)
+            this.votingRightName = right && right["name"]
+          })
+          this.rounds.pipe().subscribe(rounds => {
+            let round = rounds.find(round => round["value"] === question["roundId"])
+            this.roundName = round && round["name"]
+          })
+        }
+      )
+    ).subscribe()
+
   }
 
   changeHandler(state) {
@@ -66,7 +89,6 @@ export class QuestionFormComponent implements OnInit {
     this.dialog.open(DeleteConfirmDialogComponent, { data: this.questionForm.controls.name.value }).afterClosed().subscribe(
       result => {
         if (result) {
-          // TODO landsraad/votes warning permission errors: this worked: ".write": "auth.uid == 'swiss'",
           this.db.object("landsraad/answers/"+this.questionId).remove();
           this.db.object("landsraad/votes/"+this.questionId).remove();
           this.db.object(this.path).remove()
