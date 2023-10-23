@@ -1,7 +1,7 @@
 <div class="tab-content">
     <p>Zobrazené otázky:</p>
     <mat-card>
-        <form [formGroup]="questionsConfig" appFireForm [path]="path">
+        <form [formGroup]="questionsConfig" appFireForm [path]="questionsConfigPath">
             <mat-form-field class="filter-by-round">
                 <mat-label>Filtrovat otázky pro kolo</mat-label>
                 <mat-select formControlName="filterByRound">

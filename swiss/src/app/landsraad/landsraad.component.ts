@@ -22,7 +22,7 @@ export class LandsraadComponent implements OnInit {
   resultsShown: Observable<boolean>
   rounds: Observable<ValueName[]>
   filteredRoundSelected: string = ""
-  path: string = "landsraad/questionsConfig"
+  questionsConfigPath: string = "landsraad/questionsConfig"
   questionsConfig: FormGroup
   showHiddenQuestions: Observable<boolean>
   filterByRoundId: Observable<string>
@@ -34,7 +34,7 @@ export class LandsraadComponent implements OnInit {
     this.showHiddenQuestions = this.db.object("landsraad/questionsConfig/showHiddenQuestions").valueChanges() as Observable<boolean>
     this.filterByRoundId = this.db.object("landsraad/questionsConfig/filterByRound").valueChanges() as Observable<string>
     this.questionsConfig = this.fb.group({
-      showHiddenQuestions: [true],
+      showHiddenQuestions: [],
       filterByRound: [""]
     })
     this.delegates = this.db.list("delegates").snapshotChanges().pipe(
