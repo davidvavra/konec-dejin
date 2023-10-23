@@ -100,7 +100,7 @@ export interface ValueName {
     name: string;
 }
 
-export interface ValueNameExtended extends ValueName {
+export interface ValueNameWithQuestionType extends ValueName {
     roundId: string;
     hidden: boolean;
     questionType: string;

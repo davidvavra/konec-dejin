@@ -179,7 +179,7 @@ path /landsraad/votingConfig {
 }
 
 path /landsraad/questionsConfig {
-  read() { isSignedIn() }
+  read() { isSwiss() || isSignedIn() }
   write() { isSwiss() }
 }
 

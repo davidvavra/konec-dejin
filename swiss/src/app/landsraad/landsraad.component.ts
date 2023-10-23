@@ -3,7 +3,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, combineLatest } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
-import { ValueName, ValueNameExtended, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
+import { ValueName, ValueNameWithQuestionType, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-landsraad',
@@ -58,7 +58,7 @@ export class LandsraadComponent implements OnInit {
       (questionsSnapshots, showHiddenQuestions, filterByRoundId) => {
         let snapshotsFiltered = questionsSnapshots
         .filter(snapshot => {
-          let question = snapshot.payload.val() as ValueNameExtended
+          let question = snapshot.payload.val() as ValueNameWithQuestionType
           return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
         })
         return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
@@ -69,7 +69,7 @@ export class LandsraadComponent implements OnInit {
       this.showHiddenQuestions,
       this.filterByRoundId,
       (questionsSnapshots, showHiddenQuestions, filterByRoundId) => {
-        let questions: ValueNameExtended[] = questionsSnapshots
+        let questions: ValueNameWithQuestionType[] = questionsSnapshots
         .map(snapshot => {
           let question = snapshot.payload.val()
           return {
@@ -80,7 +80,7 @@ export class LandsraadComponent implements OnInit {
             questionType: question["questionType"]
           }
         })
-        let filteredQuestions: ValueNameExtended[] = questions
+        let filteredQuestions: ValueNameWithQuestionType[] = questions
         .filter(question => {
           return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
         })
@@ -175,7 +175,7 @@ export class LandsraadComponent implements OnInit {
     this.db.object("landsraad/votingConfig/resultsShown").set(event.checked)
   }
 
-  questionEligibleToDisplay(question: ValueNameExtended, showHiddenQuestions: boolean, filterByRoundId: string) {
+  questionEligibleToDisplay(question: ValueNameWithQuestionType, showHiddenQuestions: boolean, filterByRoundId: string) {
     // questionType available
     return !!question["questionType"]
     // shown / hidden condition
