@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
+import { Observable, combineLatest } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
-import { ValueName, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
+import { ValueName, ValueNameWithQuestionType, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-landsraad',
@@ -20,10 +20,23 @@ export class LandsraadComponent implements OnInit {
   alreadyVotedCount: Observable<number>
   maxVotedCount: Observable<number>
   resultsShown: Observable<boolean>
+  rounds: Observable<ValueName[]>
+  filteredRoundSelected: string = ""
+  questionsConfigPath: string = "landsraad/questionsConfig"
+  questionsConfig: FormGroup
+  showHiddenQuestions: Observable<boolean>
+  filterByRoundId: Observable<string>
+  votingRights: Observable<ValueName[]>
 
-  constructor(public db: AngularFireDatabase) { }
+  constructor(private fb: FormBuilder, public db: AngularFireDatabase) { }
 
   ngOnInit() {
+    this.showHiddenQuestions = this.db.object("landsraad/questionsConfig/showHiddenQuestions").valueChanges() as Observable<boolean>
+    this.filterByRoundId = this.db.object("landsraad/questionsConfig/filterByRound").valueChanges() as Observable<string>
+    this.questionsConfig = this.fb.group({
+      showHiddenQuestions: [],
+      filterByRound: [""]
+    })
     this.delegates = this.db.list("delegates").snapshotChanges().pipe(
       map(
         snapshots => {
@@ -38,26 +51,48 @@ export class LandsraadComponent implements OnInit {
           return snapshots.map(snapshot => "landsraad/votingRights/" + snapshot.key)
         })
     )
-    this.questionPaths = this.db.list("landsraad/questions").snapshotChanges().pipe(
-      map(
-        snapshots => {
-          let snapshotsFiltered = snapshots.filter(snap => {
-            const question = snap.payload.val()
-            // as we now have to fill-in DB object even if no question is selected, filter out "no selected" question
-            return question["questionType"] !== ""
-          })
-          return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
+    this.questionPaths = combineLatest(
+      this.db.list("landsraad/questions").snapshotChanges(),
+      this.showHiddenQuestions,
+      this.filterByRoundId,
+      (questionsSnapshots, showHiddenQuestions, filterByRoundId) => {
+        let snapshotsFiltered = questionsSnapshots
+        .filter(snapshot => {
+          let question = snapshot.payload.val() as ValueNameWithQuestionType
+          return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
         })
+        return snapshotsFiltered.map(snapshot => "landsraad/questions/" + snapshot.key)
+      }      
     )
-    this.questions = this.db.list("landsraad/questions").snapshotChanges().pipe(
-      map(
-        snapshots => {
-          return snapshots
-          .filter(snapshot => snapshot.payload.val()["questionType"] !== "")
-          .map(snapshot => {
-            return { value: snapshot.key, name: snapshot.payload.val()["name"] }
-          }).concat({ value: "", name: "- Žádná -" })
+    this.questions = combineLatest(
+      this.db.list("landsraad/questions").snapshotChanges(),
+      this.showHiddenQuestions,
+      this.filterByRoundId,
+      (questionsSnapshots, showHiddenQuestions, filterByRoundId) => {
+        let questions: ValueNameWithQuestionType[] = questionsSnapshots
+        .map(snapshot => {
+          let question = snapshot.payload.val()
+          return {
+            value: snapshot.key, 
+            name: question["name"],
+            roundId: question["roundId"],
+            hidden: question["hidden"],
+            questionType: question["questionType"]
+          }
         })
+        let filteredQuestions: ValueNameWithQuestionType[] = questions
+        .filter(question => {
+          return this.questionEligibleToDisplay(question, showHiddenQuestions, filterByRoundId)
+        })
+        return filteredQuestions
+        .map(question => {
+          return {
+            value: question["value"],
+            name: question["name"]
+          }
+        })
+        .concat({ value: "", name: "- Žádná -" })
+      }
     )
     this.currentQuestion = this.db.object("landsraad/currentQuestion").valueChanges() as Observable<string>
     this.alreadyVotedCount = (this.db.object("landsraad/currentQuestion").valueChanges() as Observable<string>).pipe(flatMap((currentQuestionId, _) => {
@@ -67,6 +102,38 @@ export class LandsraadComponent implements OnInit {
     }))
     this.maxVotedCount = this.votingRightPaths.pipe(map(items => items.length))
     this.resultsShown = this.db.object("landsraad/votingConfig/resultsShown").valueChanges() as Observable<boolean>
+    this.rounds = this.db.list("rounds").snapshotChanges().pipe(
+      map(
+        roundsSnapshots => {
+          let formattedRounds = roundsSnapshots.map(roundRef => {
+            let round = roundRef.payload.val()
+            let key = roundRef.key
+            return {
+              value: key,
+              name: round["name"]
+            }
+          })
+          formattedRounds.push({ value: "", name: "- Žádné -" })
+          return formattedRounds
+        }
+      )
+    )
+    this.votingRights = this.db.list("landsraad/votingRights").snapshotChanges().pipe(
+      map(
+        rightsSnapshots => {
+          let formattedRights = rightsSnapshots.map(rightRef => {
+            let right = rightRef.payload.val()
+            let key = rightRef.key
+            return {
+              value: key,
+              name: right["name"]
+            }
+          })
+          formattedRights.push({ value: "", name: "- Žádný -" })
+          return formattedRights
+        }
+      )
+    )
   }
 
   addVotingRight(form: NgForm) {
@@ -82,8 +149,12 @@ export class LandsraadComponent implements OnInit {
   addQuestion(form: NgForm) {
     if (form.valid) {
       let ref = this.db.list("landsraad/questions").push({
+        name: form.value["name"],
         questionType: QUESTION_TYPE_HLAS_LANDSRAADU["value"],
-        name: form.value["name"]
+        byVotingRightId: "",
+        byDelegateId: "",
+        roundId: "",
+        hidden: false
       });
       (form.value["answers"] as string).split(",").forEach(
         answer => {
@@ -102,5 +173,14 @@ export class LandsraadComponent implements OnInit {
   toggleVotingCheckbox(event) {
     this.resultsShown = event.checked
     this.db.object("landsraad/votingConfig/resultsShown").set(event.checked)
+  }
+
+  questionEligibleToDisplay(question: ValueNameWithQuestionType, showHiddenQuestions: boolean, filterByRoundId: string) {
+    // questionType available
+    return !!question["questionType"]
+    // shown / hidden condition
+      && (showHiddenQuestions || !showHiddenQuestions && !question.hidden) 
+    // roundId filtering condition
+      && (filterByRoundId === "" || filterByRoundId !== "" && (!question.roundId || question.roundId === filterByRoundId))
   }
 }

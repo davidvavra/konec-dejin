@@ -6,6 +6,8 @@ import { ngxCsv } from 'ngx-csv';
 import { combineLatest, Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { DeleteConfirmDialogComponent } from '../delete-confirm-dialog/delete-confirm-dialog.component';
+import { ValueName } from '../../../../common/config';
+import { ALL_QUESTIONS, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-question-form',
@@ -17,17 +19,30 @@ export class QuestionFormComponent implements OnInit {
   constructor(private fb: FormBuilder, private db: AngularFireDatabase, private dialog: MatDialog) { }
 
   questionForm: FormGroup;
-
   state: string;
-
   questionId: string;
 
   @Input()
   path: string
 
+  @Input()
+  delegates: Observable<ValueName[]>
+
+  @Input()
+  rounds: Observable<ValueName[]>
+
+  @Input()
+  votingRights: Observable<ValueName[]>
+
+  delegateName: string
+  roundName: string
+  votingRightName: string
+  questionTypeFormatted: string
+
   answerPaths: Observable<string[]>
 
   ngOnInit() {
+    ALL_QUESTIONS.push(QUESTION_TYPE_HLAS_LANDSRAADU)
     this.questionForm = this.fb.group({
       name: ['']
     })
@@ -39,6 +54,27 @@ export class QuestionFormComponent implements OnInit {
           return snapshots.map(snapshot => "landsraad/answers/" + this.questionId + "/" + snapshot.key)
         })
     )
+    this.db.object(this.path).valueChanges().pipe(
+      tap(
+        question => {
+          let questionDef = ALL_QUESTIONS.find(q => q["value"] === question["questionType"])
+          this.questionTypeFormatted = questionDef && questionDef["name"]
+          this.delegates.pipe().subscribe(delegates => {
+            let delegate = delegates.find(delegate => delegate["value"] === question["byDelegateId"])
+            this.delegateName = delegate && delegate["name"]
+          })
+          this.votingRights.pipe().subscribe(rights => {
+            let right = rights.find(right => right["value"] === question["byVotingRightId"])
+            this.votingRightName = right && right["name"]
+          })
+          this.rounds.pipe().subscribe(rounds => {
+            let round = rounds.find(round => round["value"] === question["roundId"])
+            this.roundName = round && round["name"]
+          })
+        }
+      )
+    ).subscribe()
+
   }
 
   changeHandler(state) {

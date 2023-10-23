@@ -100,6 +100,12 @@ export interface ValueName {
     name: string;
 }
 
+export interface ValueNameWithQuestionType extends ValueName {
+    roundId: string;
+    hidden: boolean;
+    questionType: string;
+}
+
 export function findValueName(rows: ValueName[], value: string) {
     if (value == undefined) return "N/A"
     let row = rows.find((row) => row.value == value)

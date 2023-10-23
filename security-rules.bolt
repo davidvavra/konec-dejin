@@ -164,6 +164,7 @@ path /landsraad/answers {
 
 path /landsraad/votes {
   read() { isSwiss() || isSignedIn() }
+  write() { isSwiss() }
   path /{question_id}/{voting_right_id} {
     delete() { isControllingVotingRight(voting_right_id) }
   }
@@ -174,6 +175,11 @@ path /landsraad/votes {
 
 path /landsraad/votingConfig {
   read() { isSignedIn() }
+  write() { isSwiss() }
+}
+
+path /landsraad/questionsConfig {
+  read() { isSwiss() || isSignedIn() }
   write() { isSwiss() }
 }
 

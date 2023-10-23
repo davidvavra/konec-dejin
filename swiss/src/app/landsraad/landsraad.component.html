@@ -1,4 +1,24 @@
 <div class="tab-content">
+    <p>Zobrazené otázky:</p>
+    <mat-card>
+        <form [formGroup]="questionsConfig" appFireForm [path]="questionsConfigPath">
+            <mat-form-field class="filter-by-round">
+                <mat-label>Filtrovat otázky pro kolo</mat-label>
+                <mat-select formControlName="filterByRound">
+                    <mat-option *ngFor="let round of rounds | async" [value]="round.value">
+                        {{round.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-checkbox class="basic-checkbox" formControlName="showHiddenQuestions">
+                Ukázat schované otázky
+            </mat-checkbox>&nbsp;
+        </form>
+        <ng-container>
+            <span>Otázky které nejsou přiřazené k žádnému kolu (otázky přidané pomocí "Přidat otázku" níže) jsou zobrazeny vždy.</span>
+        </ng-container>
+    </mat-card>
+    <p>Hlasování a výsledky Landsraadu:</p>
     <mat-card class="card">
         <form #currentQuestionForm="ngForm">
             <mat-form-field class="defined-width">
@@ -20,16 +40,16 @@
     </mat-card>
     <p>Otázky:</p>
     <mat-card class="card">
-        <app-question-form *ngFor="let path of questionPaths | async" [path]="path"></app-question-form>
+        <app-question-form *ngFor="let path of questionPaths | async" [path]="path" [delegates]="delegates" [votingRights]="votingRights" [rounds]="rounds"></app-question-form>
     </mat-card>
     <p>Přidat otázku:</p>
     <mat-card class="card">
         <form (ngSubmit)="addQuestion(addQuestionForm)" #addQuestionForm="ngForm">
-            <mat-form-field class="text">
+            <mat-form-field class="input-question">
                 <input matInput placeholder="Otázka" type="text" name="name" required ngModel>
             </mat-form-field>
             <br />
-            <mat-form-field class="text">
+            <mat-form-field class="input-answers">
                 <input matInput placeholder="Odpovědi oddělené čárkou" type="text" name="answers" required ngModel>
             </mat-form-field>
             <br />
