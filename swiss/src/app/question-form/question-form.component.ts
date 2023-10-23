@@ -44,7 +44,8 @@ export class QuestionFormComponent implements OnInit {
   ngOnInit() {
     ALL_QUESTIONS.push(QUESTION_TYPE_HLAS_LANDSRAADU)
     this.questionForm = this.fb.group({
-      name: ['']
+      name: [''],
+      hidden: []
     })
     let paths = this.path.split("/")
     this.questionId = paths[2]
