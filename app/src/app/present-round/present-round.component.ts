@@ -26,6 +26,7 @@ export class PresentRoundComponent implements OnInit {
   delegateId: string
   delegationId: string
   spentDf = new BehaviorSubject<number>(0)
+  roundIsSmall: boolean
 
   ngOnInit() {
     let delegateActions = this.db.object("delegateRounds/" + this.delegateId + "/" + this.roundId + "/delegation").valueChanges().pipe(
@@ -52,6 +53,14 @@ export class PresentRoundComponent implements OnInit {
         return val as boolean
       })
     )
+    this.db.list("landsraad/rounds").snapshotChanges().pipe(
+      tap(
+        roundsSnapshots => {
+          let currentRoundSnapshot = roundsSnapshots.find(roundSnapshot => roundSnapshot.key === this.roundId)
+          this.roundIsSmall = currentRoundSnapshot && currentRoundSnapshot.payload.val()["name"].toLowerCase().includes("malé")
+        }
+      )
+    ).subscribe()
     this.controlledVotingRights = combineLatest(
       this.db.list("landsraad/votingRights", ref => ref.orderByChild("controlledBy").equalTo(this.delegateId)).snapshotChanges(),
       this.db.list("landsraad/questions/", ref => ref.orderByChild("byDelegateId").equalTo(this.delegateId)).snapshotChanges(),
