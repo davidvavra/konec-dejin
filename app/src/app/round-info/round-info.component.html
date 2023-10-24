@@ -2,9 +2,11 @@
     <mat-card class="action">
         <p><i class="em-svg em-{{ info.flag }}"></i> {{ info.name }}
         </p>
-        <p *ngIf="info.presentRound">Deadline odeslání depeše: <strong>{{ info.deadline }}</strong>
+        <p *ngIf="(info.presentRound && info.smallSize)">Deadline odeslání depeše a dekretů: <strong>{{ info.deadline }}</strong>
         </p>
-        <p *ngIf="!info.presentRound">Deadline odeslání depeše: {{ info.deadline }}</p>
+        <p *ngIf="(info.presentRound && !info.smallSize)">Deadline odeslání depeše: <strong>{{ info.deadline }}</strong>
+        </p>
+        <p *ngIf="!info.presentRound">Deadline odeslání depeše a dekretů: {{ info.deadline }}</p>
     </mat-card>
     <mat-card class="action" *ngIf="info.message">
         <p>Důležitá sdělení vedení:</p>

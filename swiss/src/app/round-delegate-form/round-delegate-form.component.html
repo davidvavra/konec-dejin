@@ -17,8 +17,9 @@
     </ng-container> | 
     <span class="positive" *ngIf="delegateForm.controls.markedAsSent.value">Depeše odeslána</span>
     <span class="negative" *ngIf="!delegateForm.controls.markedAsSent.value">Depeše neodeslána</span> |
-    <span class="positive" *ngIf="delegateForm.controls.markedLandsraadQuestionsAsSent.value">Dekrety odeslány</span>
-    <span class="negative" *ngIf="!delegateForm.controls.markedLandsraadQuestionsAsSent.value">Dekrety neodeslány</span>
+    <span class="neutral" *ngIf="!smallSize">Dekrety se neodesílají</span>
+    <span class="positive" *ngIf="smallSize && delegateForm.controls.markedLandsraadQuestionsAsSent.value">Dekrety odeslány</span>
+    <span class="negative" *ngIf="smallSize && !delegateForm.controls.markedLandsraadQuestionsAsSent.value">Dekrety neodeslány</span>
     <br />
     <mat-form-field class="message">
         <textarea matInput placeholder="Důležitá sdělení vedení" formControlName="message"></textarea>

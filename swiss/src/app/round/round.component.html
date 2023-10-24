@@ -3,8 +3,9 @@
         <mat-form-field>
             <input matInput placeholder="Název" type="text" formControlName="name">
         </mat-form-field>&nbsp;
-        <mat-form-field>
-            <input matInput placeholder="Deadline odeslání depeší" type="text" formControlName="deadline">
+        <mat-form-field class="wider">
+            <input *ngIf="smallSize" matInput placeholder="Deadline odeslání depeší a dekretů" type="text" formControlName="deadline">
+            <input *ngIf="!smallSize" matInput placeholder="Deadline odeslání depeší" type="text" formControlName="deadline">
         </mat-form-field>
         &nbsp;
         <mat-form-field>
@@ -30,7 +31,7 @@
 <p>Hráči:</p>
 <mat-card class="card">
     <div *ngIf="editingDelegates">
-        <app-round-delegate-form *ngFor="let path of delegatePaths | async" [path]="path"></app-round-delegate-form>
+        <app-round-delegate-form *ngFor="let path of delegatePaths | async" [path]="path" [smallSize]="smallSize"></app-round-delegate-form>
     </div>
     <button mat-button color="accent" *ngIf="!editingDelegates" (click)="editDelegates()">Upravit</button>
     <button mat-button color="accent" *ngIf="editingDelegates" (click)="dontEditDelegates()">Sbalit</button>
@@ -139,7 +140,8 @@
 </mat-card>
 <p>Dekrety:</p>
 <mat-card clas="card">
-    <button mat-stroked-button color="accent" (click)="setQuestions()">Nastavit dekrety pro kolo</button>&nbsp;
+    <button *ngIf="smallSize" mat-stroked-button color="accent" (click)="setQuestions()">Nastavit dekrety pro malé kolo</button>&nbsp;
+    <p class="decree-info" *ngIf="!smallSize">Dekrety se navrhují pouze v malém kole.</p>
 </mat-card>
 <br />
 <button mat-stroked-button color="accent" (click)="deleteRound()">Smazat kolo</button>

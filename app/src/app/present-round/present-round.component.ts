@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { map, flatMap, tap } from 'rxjs/operators';
+import { RoundInfoBasic } from '../model';
 
 @Component({
   selector: 'app-present-round',
@@ -19,6 +20,7 @@ export class PresentRoundComponent implements OnInit {
   @Input()
   roundId: string
 
+  smallSize: boolean
   primaryActionPaths: Observable<string[]>
   markedAsSent: Observable<boolean>
   markedLandsraadQuestionsAsSent: Observable<boolean>
@@ -82,6 +84,13 @@ export class PresentRoundComponent implements OnInit {
         return votingRightsPath
       }
     )
+    this.db.object(`rounds/${this.roundId}`).valueChanges().pipe(
+      tap(
+        (round: RoundInfoBasic) => {
+          this.smallSize = round && round.size.toLowerCase() === "small"
+        }
+      )
+    ).subscribe()
   }
 
   send() {
