@@ -5,7 +5,8 @@
     "serve": "npm run build && firebase serve --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "firebase use test && firebase deploy --only functions",
+    "deploy-prod": "firebase use default && firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "engines": {

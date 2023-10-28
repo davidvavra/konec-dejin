@@ -5,6 +5,7 @@ import { SignInResponse } from '../model';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login-navigation',
@@ -35,7 +36,8 @@ export class LoginNavigationComponent implements OnInit {
     this.loading = true
     this.passwordError = false
     let passwordValue = (password == undefined) ? "" : password.value
-    this.http.get<SignInResponse>("https://us-central1-dune-new-dawn.cloudfunctions.net/swissLogin?password=" + passwordValue).subscribe(
+    console.log("url", `${environment.databaseFunctionsUrl}/login?password=${passwordValue}`)
+    this.http.get<SignInResponse>(`${environment.databaseFunctionsUrl}/login?password=${passwordValue}`).subscribe(
       (data: SignInResponse) => {
         if (data.invalidPassword) {
           this.loading = false

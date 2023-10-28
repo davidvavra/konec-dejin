@@ -12,7 +12,8 @@ export const environment = {
     storageBucket: "dune-new-dawn-test.appspot.com",
     messagingSenderId: "919714169436",
     appId: "1:919714169436:web:b09abc82ac16cbc41f1c99"
-}
+  },
+  databaseFunctionsUrl: "https://europe-west1-dune-new-dawn-test.cloudfunctions.net"
 };
 
 /*
