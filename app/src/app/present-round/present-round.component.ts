@@ -19,6 +19,7 @@ export class PresentRoundComponent implements OnInit {
   @Input()
   roundId: string
 
+  smallSize: boolean
   primaryActionPaths: Observable<string[]>
   markedAsSent: Observable<boolean>
   markedLandsraadQuestionsAsSent: Observable<boolean>
@@ -82,6 +83,14 @@ export class PresentRoundComponent implements OnInit {
         return votingRightsPath
       }
     )
+    this.db.list("rounds").snapshotChanges().pipe(
+      tap(
+        roundsSnapshots => {
+          let currentRoundSnapshot = roundsSnapshots.find(roundSnapshot => roundSnapshot.key === this.roundId)
+          this.smallSize = currentRoundSnapshot && currentRoundSnapshot.payload.val()["name"].toLowerCase().includes("malé")
+        }
+      )
+    ).subscribe()
   }
 
   send() {

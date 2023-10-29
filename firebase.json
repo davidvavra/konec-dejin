@@ -51,6 +51,21 @@
     "source": "functions"
   },
   "database": {
-    "rules": "security-rules.bolt"
+    "rules": "security-rules.json"
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "database": {
+      "port": 9000
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
   }
 }

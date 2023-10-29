@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "dune-new-dawn"
+    "default": "dune-new-dawn-test",
+    "test": "dune-new-dawn-test"
   },
   "targets": {
     "dune-new-dawn": {
@@ -15,6 +16,20 @@
           "dva-web"
         ]
       }
+    },
+    "dune-new-dawn-test": {
+      "hosting": {
+        "app": [
+          "dune-new-dawn-test"
+        ],
+        "swiss": [
+          "dnd-admin-test"
+        ],
+        "web": [
+          "dva-web-test"
+        ]
+      }
     }
-  }
+  },
+  "etags": {}
 }

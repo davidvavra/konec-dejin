@@ -8,5 +8,6 @@ export const environment = {
     storageBucket: "dune-new-dawn.appspot.com",
     messagingSenderId: "67050882133",
     appId: "1:67050882133:web:5df5cfefccf8154df300dc"
-  }
+  },
+  databaseFunctionsUrl: "https://us-central1-dune-new-dawn.cloudfunctions.net"
 };

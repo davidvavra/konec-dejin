@@ -5,14 +5,15 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyCtDgiQcochnZtSYFIBYaeEuJjG__WyWCo",
-    authDomain: "dune-new-dawn.firebaseapp.com",
-    databaseURL: "https://dune-new-dawn.firebaseio.com",
-    projectId: "dune-new-dawn",
-    storageBucket: "dune-new-dawn.appspot.com",
-    messagingSenderId: "67050882133",
-    appId: "1:67050882133:web:5df5cfefccf8154df300dc"
-  }
+    apiKey: "AIzaSyA_rCgifOsvCiYbSEJoU22uGQEabSH3CWI",
+    authDomain: "dune-new-dawn-test.firebaseapp.com",
+    databaseURL: "https://dune-new-dawn-test-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dune-new-dawn-test",
+    storageBucket: "dune-new-dawn-test.appspot.com",
+    messagingSenderId: "919714169436",
+    appId: "1:919714169436:web:b09abc82ac16cbc41f1c99"
+  },
+  databaseFunctionsUrl: "https://europe-west1-dune-new-dawn-test.cloudfunctions.net"
 };
 
 /*

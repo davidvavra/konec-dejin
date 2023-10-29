@@ -3,8 +3,9 @@
         <mat-form-field>
             <input matInput placeholder="Název" type="text" formControlName="name">
         </mat-form-field>&nbsp;
-        <mat-form-field>
-            <input matInput placeholder="Deadline odeslání depeší" type="text" formControlName="deadline">
+        <mat-form-field class="wider">
+            <input *ngIf="smallSize" matInput placeholder="Deadline odeslání depeší a dekretů" type="text" formControlName="deadline">
+            <input *ngIf="!smallSize" matInput placeholder="Deadline odeslání depeší" type="text" formControlName="deadline">
         </mat-form-field>
         &nbsp;
         <mat-form-field>
@@ -139,7 +140,8 @@
 </mat-card>
 <p>Dekrety:</p>
 <mat-card clas="card">
-    <button mat-stroked-button color="accent" (click)="setQuestions()">Nastavit dekrety pro kolo</button>&nbsp;
+    <button *ngIf="smallSize" mat-stroked-button color="accent" (click)="setQuestions()">Nastavit dekrety pro malé kolo</button>&nbsp;
+    <p class="decree-info" *ngIf="!smallSize">Dekrety se navrhují pouze v malém kole.</p>
 </mat-card>
 <br />
 <button mat-stroked-button color="accent" (click)="deleteRound()">Smazat kolo</button>
