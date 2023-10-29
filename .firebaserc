@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "dune-new-dawn",
+    "default": "dune-new-dawn-test",
     "test": "dune-new-dawn-test"
   },
   "targets": {

@@ -60,7 +60,9 @@ export class LoginNavigationComponent implements OnInit {
     this.passwordError = false
     let passwordValue = (password == undefined) ? "" : password.value
     console.log("url", `${environment.databaseFunctionsUrl}/login?password=${passwordValue}`)
-    this.http.get<SignInResponse>(`${environment.databaseFunctionsUrl}/login?password=${passwordValue}`).subscribe(
+    const tempUrl = "http://127.0.0.1:5001/dune-new-dawn-test/europe-west1"
+    console.log(tempUrl)
+    this.http.get<SignInResponse>(`${tempUrl}/login?password=${passwordValue}`).subscribe(
       (data: SignInResponse) => {
         if (data.invalidPassword) {
           this.loading = false
