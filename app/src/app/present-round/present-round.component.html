@@ -10,7 +10,7 @@
 kompletní a může začít vyhodnocování. Můžete vše editovat i po odeslání, ale může se stát že už se na to ve vyhodnocování nebude brát zřetel. Vyhodnocování také začne po deadlinu i pokud jste depeši neodeslali. Pokud
 potřebujete více času, napište na Slacku.)</p>
 <br />
-<ng-container *ngIf="roundIsSmall">
+<ng-container *ngIf="smallSize">
   <app-decret-form *ngFor="let votingRight of controlledVotingRights | async" [votingRight]="votingRight" [roundId]="roundId" [delegateId]="delegateId"></app-decret-form>
   <br />
   <button mat-raised-button color="accent" *ngIf="!(markedLandsraadQuestionsAsSent | async) else questionSent" (click)="sendQuestion()">Odeslat návrh dekretů</button>
