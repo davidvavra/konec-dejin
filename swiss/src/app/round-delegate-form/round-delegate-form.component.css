@@ -11,6 +11,9 @@
 .negative {
     color: #FF5252;
 }
+.neutral {
+    color: gray;
+}
 .message {
     width: 40em;
 }

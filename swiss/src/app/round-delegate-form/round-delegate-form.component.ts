@@ -20,6 +20,9 @@ export class RoundDelegateFormComponent implements OnInit {
   @Input()
   path: string
 
+  @Input()
+  smallSize: boolean
+
   name: Observable<string>
 
   delegations: Observable<Delegation[]>

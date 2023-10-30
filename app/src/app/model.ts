@@ -24,6 +24,13 @@ export interface DelegateRound {
     delegationId: string
 }
 
+export interface RoundInfoBasic {
+    deadline: string,
+    name: string,
+    size: string,
+    tense: string
+}
+
 export interface RoundInfo {
     name: string,
     flag: string,
