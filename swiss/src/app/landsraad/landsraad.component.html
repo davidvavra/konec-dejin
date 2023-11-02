@@ -30,7 +30,7 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-            <mat-checkbox class="basic-checkbox" checked="(resultsShown | async)" (change)="toggleVotingCheckbox($event)">
+            <mat-checkbox class="basic-checkbox" [checked]="resultsShown | async" (change)="toggleVotingCheckbox($event)">
                 Ukázat výsledky
             </mat-checkbox>
         </form>

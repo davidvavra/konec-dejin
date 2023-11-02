@@ -171,7 +171,6 @@ export class LandsraadComponent implements OnInit {
   }
 
   toggleVotingCheckbox(event) {
-    this.resultsShown = event.checked
     this.db.object("landsraad/votingConfig/resultsShown").set(event.checked)
   }
 
