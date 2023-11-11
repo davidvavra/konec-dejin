@@ -21,6 +21,7 @@ export class PresentRoundComponent implements OnInit {
   roundId: string
 
   smallSize: boolean
+  hasVotingRight: boolean
   primaryActionPaths: Observable<string[]>
   markedAsSent: Observable<boolean>
   markedLandsraadQuestionsAsSent: Observable<boolean>
@@ -84,6 +85,10 @@ export class PresentRoundComponent implements OnInit {
         return votingRightsPath
       }
     )
+    this.controlledVotingRights.pipe(
+      tap(votingRightsPaths => {
+        this.hasVotingRight = votingRightsPaths.length && votingRightsPaths.length >= 0})
+    ).subscribe()
     this.db.object(`rounds/${this.roundId}`).valueChanges().pipe(
       tap(
         (round: RoundInfoBasic) => {

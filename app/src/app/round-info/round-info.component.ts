@@ -32,12 +32,25 @@ export class RoundInfoComponent implements OnInit {
           this.db.object("delegations/" + delegationId).valueChanges(),
           this.spentDf,
           this.db.list("bvRounds/" + this.roundId + "/" + delegateId).valueChanges(),
-          (round, delegation, spentDf, bvs) => {
+          this.db.list("landsraad/votingRights", ref => ref.orderByChild("controlledBy").equalTo(delegateId)).valueChanges(),
+          (round, delegation, spentDf, bvs, votingRights) => {
             let presentRound = round["tense"] == "present"
             let availableDf = delegateRound["bv"];
             let df = (presentRound) ? availableDf - spentDf : spentDf
             let smallSize = round["size"] == "small"
-            return { name: delegation["name"], flag: delegation["flag"], deadline: round["deadline"], presentRound: presentRound, message: delegateRound["message"], availableDf: availableDf, df: df, bvs: bvs, smallSize: smallSize }
+            let hasVotingRight = votingRights.length && votingRights.length >= 0
+            return {
+              name: delegation["name"],
+              flag: delegation["flag"],
+              deadline: round["deadline"],
+              presentRound: presentRound,
+              message: delegateRound["message"],
+              availableDf: availableDf,
+              df: df,
+              bvs: bvs,
+              smallSize: smallSize,
+              hasVotingRight: hasVotingRight
+            }
           }
         )
       }
