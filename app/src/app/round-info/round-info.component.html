@@ -2,6 +2,8 @@
     <mat-card class="action">
         <p><i class="em-svg em-{{ info.flag }}"></i> {{ info.name }}
         </p>
+        <p>Typ tohoto kola: <strong>{{ info.sizeName }}</strong>
+        </p>
         <p *ngIf="(info.presentRound && info.smallSize && info.hasVotingRight)">Deadline odeslání depeše a dekretů: <strong>{{ info.deadline }}</strong>
         </p>
         <p *ngIf="(info.presentRound && (!info.smallSize || info.smallSize && !info.hasVotingRight))">Deadline odeslání depeše: <strong>{{ info.deadline }}</strong>
