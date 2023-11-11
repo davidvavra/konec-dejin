@@ -38,6 +38,7 @@ export class RoundInfoComponent implements OnInit {
             let availableDf = delegateRound["bv"];
             let df = (presentRound) ? availableDf - spentDf : spentDf
             let smallSize = round["size"] == "small"
+            let sizeName = smallSize ? "malé" : "velké"
             let hasVotingRight = votingRights.length && votingRights.length >= 0
             return {
               name: delegation["name"],
@@ -49,6 +50,7 @@ export class RoundInfoComponent implements OnInit {
               df: df,
               bvs: bvs,
               smallSize: smallSize,
+              sizeName: sizeName,
               hasVotingRight: hasVotingRight
             }
           }
