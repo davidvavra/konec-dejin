@@ -71,7 +71,25 @@
                 <input matInput placeholder="Počet hlasů" type="number" name="votes" required ngModel>
             </mat-form-field>
             <br />
-            <mat-form-field>
+            <mat-form-field class="text">
+                <mat-label>Přidává misi navíc</mat-label>
+                <mat-select name="extraMission" ngModel>
+                    <mat-option *ngFor="let b of booleans" value="{{b.value}}">
+                        {{b.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <br />
+            <mat-form-field class="text">
+                <mat-label>Přidává špion. akci navíc</mat-label>
+                <mat-select name="extraUnit" ngModel>
+                    <mat-option *ngFor="let b of booleans" value="{{b.value}}">
+                        {{b.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <br />
+            <mat-form-field class="text">
                 <mat-label>Kontroluje</mat-label>
                 <mat-select name="controlledBy" ngModel>
                     <mat-option *ngFor="let delegate of delegates | async" value="{{delegate.value}}">
