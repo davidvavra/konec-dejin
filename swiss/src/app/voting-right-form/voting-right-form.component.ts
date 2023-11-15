@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ValueName } from '../../../../common/config';
+import { ValueName, BooleanInputs, booleans } from '../../../../common/config';
 import { DeleteConfirmDialogComponent } from '../delete-confirm-dialog/delete-confirm-dialog.component';
 
 @Component({
@@ -22,6 +22,8 @@ export class VotingRightFormComponent implements OnInit {
 
   delegates: Observable<ValueName[]>
 
+  booleans: BooleanInputs[]
+
   @Input()
   path: string
 
@@ -29,6 +31,8 @@ export class VotingRightFormComponent implements OnInit {
     this.votingRightForm = this.fb.group({
       name: [''],
       votes: [0],
+      extraMission: [false],
+      extraUnit: [false],
       controlledBy: ['']
     })
     this.delegates = this.db.list("delegates").snapshotChanges().pipe(
@@ -39,6 +43,7 @@ export class VotingRightFormComponent implements OnInit {
           }).concat({ value: "", name: "- Nikdo -" })
         })
     )
+    this.booleans = booleans
   } 
   
   changeHandler(state) {
