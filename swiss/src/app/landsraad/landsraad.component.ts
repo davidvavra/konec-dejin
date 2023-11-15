@@ -3,7 +3,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, combineLatest } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
-import { ValueName, ValueNameWithQuestionType, QUESTION_TYPE_HLAS_LANDSRAADU, BooleanInputs, booleans } from '../../../../common/config';
+import { ValueName, ValueNameWithQuestionType, QUESTION_TYPE_HLAS_LANDSRAADU } from '../../../../common/config';
 
 @Component({
   selector: 'app-landsraad',
@@ -13,7 +13,6 @@ import { ValueName, ValueNameWithQuestionType, QUESTION_TYPE_HLAS_LANDSRAADU, Bo
 export class LandsraadComponent implements OnInit {
 
   delegates: Observable<ValueName[]>
-  booleans: BooleanInputs[]
   votingRightPaths: Observable<string[]>
   questionPaths: Observable<string[]>
   questions: Observable<ValueName[]>
@@ -46,7 +45,6 @@ export class LandsraadComponent implements OnInit {
           }).concat({ value: "", name: "- Nikdo -" })
         })
     )
-    this.booleans = booleans
     this.votingRightPaths = this.db.list("landsraad/votingRights", ref => ref.orderByChild("name")).snapshotChanges().pipe(
       map(
         snapshots => {
@@ -143,9 +141,7 @@ export class LandsraadComponent implements OnInit {
       this.db.list("landsraad/votingRights").push({
         name: form.value["name"],
         votes: form.value["votes"],
-        controlledBy: form.value["controlledBy"],
-        extraMission: form.value["extraMission"],
-        extraUnit: form.value["extraUnit"]
+        controlledBy: form.value["controlledBy"]
       })
     }
   }

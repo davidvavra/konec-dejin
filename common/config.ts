@@ -112,10 +112,3 @@ export function findValueName(rows: ValueName[], value: string) {
     if (row == undefined) return "N/A"
     return row.name
 }
-
-export interface BooleanInputs {
-    value: boolean,
-    name: string
-}
-
-export const booleans: BooleanInputs[] = [{value: false, name: "NE"}, {value: true, name: "ANO"}]

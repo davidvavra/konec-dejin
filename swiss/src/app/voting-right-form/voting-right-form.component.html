@@ -2,22 +2,6 @@
     <mat-form-field class="text">
         <input matInput placeholder="Název" type="text" formControlName="name" />
     </mat-form-field>&nbsp;
-    <mat-form-field>
-        <mat-label>Přidává misi navíc</mat-label>
-        <mat-select formControlName="extraMission">
-            <mat-option *ngFor="let b of booleans" value="{{b.value}}">
-                {{b.name}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>&nbsp;
-    <mat-form-field>
-        <mat-label>Přidává špion. akci navíc</mat-label>
-        <mat-select formControlName="extraUnit">
-            <mat-option *ngFor="let b of booleans" value="{{b.value}}">
-                {{b.name}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>&nbsp;
     <mat-form-field class="number">
         <input matInput placeholder="Počet hlasů" type="number" formControlName="votes" />
     </mat-form-field>&nbsp;

@@ -8,7 +8,6 @@ import { ngxCsv } from 'ngx-csv/ngx-csv';
 import { Papa } from 'ngx-papaparse';
 import { MatDialog } from '@angular/material';
 import { DeleteConfirmDialogComponent } from '../delete-confirm-dialog/delete-confirm-dialog.component';
-import { VotingRight } from '../model';
 
 @Component({
   selector: 'app-round',
@@ -238,9 +237,7 @@ export class RoundComponent implements OnInit {
   }
 
   setSmallActions() {
-    this.dialog.open(DeleteConfirmDialogComponent, { 
-      data: "všech akcí v tomto kole a vytvoření nových prázdných: 1 mise a 1 akce libovolné jednotky"
-    }).afterClosed().subscribe(
+    this.dialog.open(DeleteConfirmDialogComponent, { data: "všech akcí v tomto kole a vytvoření nových prázdných: 1 mise a 1 akce libovolné jednotky" }).afterClosed().subscribe(
       result => {
         if (result) {
           this.db.list("actions/" + this.roundId).remove()
@@ -280,22 +277,15 @@ export class RoundComponent implements OnInit {
   }
 
   setLargeActions() {
-    this.dialog.open(DeleteConfirmDialogComponent, { 
-      data: "všech akcí v tomto kole a vytvoření nových prázdných: 1 mise a akce pro každou aktivní jednotku, mise/jednotky navíc za neutrální rody jsou také brány v potaz"
-    }).afterClosed().subscribe(
+    this.dialog.open(DeleteConfirmDialogComponent, { data: "všech akcí v tomto kole a vytvoření nových prázdných: 1 mise a akce pro každou aktivní jednotku" }).afterClosed().subscribe(
       result => {
         if (result) {
           this.db.list("actions/" + this.roundId).remove()
           combineLatest(
             this.db.list("delegateRounds").snapshotChanges(),
             this.db.list("units").snapshotChanges(),
-            this.db.list("landsraad/votingRights").valueChanges(),
-            (delegateRounds, units, votingRights) => {
-              // we only need the information for the special houses which add unit or mission
-              let votingRightsFiltered = votingRights.filter((votingRight: VotingRight) => {
-                return votingRight.extraMission.toLowerCase() === "true" || votingRight.extraUnit.toLowerCase() === "true"
-              })
-              return { delegateRounds: delegateRounds, units: units, votingRights: votingRightsFiltered }
+            (delegateRounds, units) => {
+              return { delegateRounds: delegateRounds, units: units }
             }
           )
             .pipe(
@@ -306,9 +296,6 @@ export class RoundComponent implements OnInit {
                     snapshot => {
                       let delegateId = snapshot.key
                       let delegationId = snapshot.payload.val()[this.roundId]["delegation"]
-                      let controlledVotingRights = combined.votingRights.filter((votingRight: VotingRight) => delegateId === votingRight.controlledBy)
-                      let controledMissionHouses = controlledVotingRights.filter((votingRight: VotingRight) => votingRight.extraMission.toLowerCase() === "true")
-                      let controledUnitHouses = controlledVotingRights.filter((votingRight: VotingRight) => votingRight.extraUnit.toLowerCase() === "true")
                       this.db.list("actions/" + this.roundId).push(
                         {
                           delegate: delegateId,
@@ -317,16 +304,6 @@ export class RoundComponent implements OnInit {
                           visibility: "private",
                           title: "Mise"
                         })
-                      controledMissionHouses.forEach((house: VotingRight) => {
-                        this.db.list("actions/" + this.roundId).push(
-                          {
-                            delegate: delegateId,
-                            delegation: delegationId,
-                            type: "mission",
-                            visibility: "private",
-                            title: `Mise navíc za rod ${house.name}`
-                          })
-                      })
                       combined.units.filter(snap => {
                         let unit = snap.payload.val()
                         return unit["delegate"] == delegateId && (unit["type"] == "active_hero" || unit["type"] == "army") && unit["state"] == "alive"
@@ -339,16 +316,6 @@ export class RoundComponent implements OnInit {
                             visibility: "private",
                             title: unitSnap.payload.val()["name"],
                             identifier: unitSnap.key
-                          })
-                      })
-                      controledUnitHouses.forEach((house : VotingRight) => {
-                        this.db.list("actions/" + this.roundId).push(
-                          {
-                            delegate: delegateId,
-                            delegation: delegationId,
-                            type: "unit",
-                            visibility: "private",
-                            title: `Špion za rod ${house.name}`
                           })
                       })
                       this.db.object("delegateRounds/" + snapshot.key + "/" + this.roundId + "/markedAsSent").set(false)
