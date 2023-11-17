@@ -25,7 +25,7 @@ export class PresentRoundComponent implements OnInit {
   primaryActionPaths: Observable<string[]>
   markedAsSent: Observable<boolean>
   markedLandsraadQuestionsAsSent: Observable<boolean>
-  controlledVotingRights: Observable<VotingRightWithQuestionPath[]>
+  controlledVotingRights: VotingRightWithQuestionPath[]
   delegateId: string
   delegationId: string
   spentDf = new BehaviorSubject<number>(0)
@@ -55,7 +55,7 @@ export class PresentRoundComponent implements OnInit {
         return val as boolean
       })
     )
-    this.controlledVotingRights = combineLatest(
+    combineLatest(
       this.db.list("landsraad/votingRights", ref => ref.orderByChild("controlledBy").equalTo(this.delegateId)).snapshotChanges(),
       this.db.list("landsraad/questions/", ref => ref.orderByChild("byDelegateId").equalTo(this.delegateId)).snapshotChanges(),
       (votingRightsSnapshots, questionsSnapshots) => {
@@ -84,11 +84,13 @@ export class PresentRoundComponent implements OnInit {
         )
         return votingRightsPath
       }
-    )
-    this.controlledVotingRights.pipe(
-      tap(votingRightsPaths => {
-        this.hasVotingRight = votingRightsPaths.length && votingRightsPaths.length >= 0})
+    ).pipe(
+      tap((votingRights: VotingRightWithQuestionPath[]) => {
+        this.controlledVotingRights = votingRights
+        this.hasVotingRight = votingRights.length && votingRights.filter(r => r !== null).length > 0
+      })
     ).subscribe()
+
     this.db.object(`rounds/${this.roundId}`).valueChanges().pipe(
       tap(
         (round: RoundInfoBasic) => {
